@@ -1,0 +1,206 @@
+<template>
+    <div
+        :class="'section mt-2 d-flex align-center' + (selected ? ' selected' : '')"
+        align="start"
+        @mouseenter="showBtnBar = true"
+        @mouseleave="showBtnBar = false"
+        @click.shift.exact.stop="handleClick"
+    >
+        <!-- 行号 -->
+        <span class="line-number text-subtitle-2 mr-3">{{ index + 1 }}</span>
+        
+        <span 
+            v-if="changingSpeaker"
+            class="speaker"
+        >
+            <v-select
+                class="ma-0"
+                dense
+                hide-details="auto"
+                height="1em"
+                :items="roleList"
+                item-text="name"
+                item-value="uid"
+                no-data-text="无可用角色"
+                v-model="section.speaker"
+                @blur="changingSpeaker = false"
+                @input="changingSpeaker = false"
+            />
+        </span>
+
+        <span 
+            v-else
+            class="speaker d-flex align-center"
+            @click.stop="changingSpeaker = true"
+        >
+            <RAvatar
+                size="2em"
+                contain
+                :src="speakerPicUrl"
+            />
+            <span>{{ speakerName }}</span>
+        </span>
+        
+        <span>:</span>
+
+        <!-- 文本输入 -->
+        <span class="mx-2 flex-grow-1">
+            <input
+                ref="textInput"
+                class="text-input py-1"
+                v-model="section.text"
+            />
+        </span>
+
+        <!-- 增减工具 -->
+        <v-expand-x-transition>
+            <v-btn-toggle 
+                v-if="showBtnBar"
+                class="btn-tgl"
+                dense
+                rounded
+                borderless
+            >
+                <!-- 在当前行之前插入一行 -->
+                <v-btn 
+                    icon 
+                    height="2em"
+                    class="delete-btn" 
+                    color="green"
+                    @click="$emit('add-line', index)"
+                ><v-icon>mdi-plus</v-icon></v-btn>
+                
+                <!-- 删去该行 -->
+                <v-btn 
+                    v-if="!isOnly"
+                    icon 
+                    height="2em"
+                    class="delete-btn" 
+                    color="red"
+                    @click="$emit('delete-line', index)"
+                ><v-icon>mdi-minus</v-icon></v-btn>
+            </v-btn-toggle>
+        </v-expand-x-transition>
+    </div>
+</template>
+
+<script>
+import state from '@/state.js'
+
+import RAvatar from '@/components/RAvatar.vue'
+
+const project = state.project;
+
+export default {
+    name: 'Section',
+
+    components: {
+        RAvatar
+    },
+
+    props: {
+        index: Number,
+        section: Object,
+        isOnly: Boolean,
+    },
+
+    data() {
+        return {
+            changingSpeaker: false,
+            showBtnBar: false,
+        };
+    },
+
+    computed: {
+        data: () => project.data,
+        
+        roleList() {
+            return project.roles.map(uid => ({uid, ...project.data[uid]}));
+        },
+
+        speakerName() {
+            if (this.section.speaker) {
+                const role = project.data[this.section.speaker];
+                if (role && role.pic) {
+                    return role.name;
+                }
+            }
+            return '      ';
+        },
+
+        speakerPicUrl() {
+            if (this.section.speaker) {
+                const role = project.data[this.section.speaker];
+                if (role) {
+                    const res = project.data[role.avatar || role.pic];
+                    if (res) {
+                        return res.src;
+                    }
+                }
+            }
+            return null;
+        },
+
+        selected() {
+            return state.chunkEditorBar.selectState.has(this.index);
+        },
+    },
+
+    methods: {
+        focus() {
+            this.$refs.textInput.focus();
+        },
+
+        handleClick() {
+            if (state.chunkEditorBar.clickMode === 'select') {
+                if (state.chunkEditorBar.selectState.has(this.index)) {
+                    state.chunkEditorBar.selectState.delete(this.index);
+                } else {
+                    state.chunkEditorBar.selectState.add(this.index);
+                }
+            } else if (state.chunkEditorBar.clickMode === 'fill') {
+                this.section.speaker = state.chunkEditorBar.primaryRoleUid || this.section.speaker;
+            }
+        },
+    },
+
+}
+</script>
+
+<style lang="scss" scoped>
+.section {
+    width: 100%;
+
+    * {
+        z-index: inherit;
+    }
+}
+
+.line-number {
+    width: 2.5em;
+    text-align: right;
+}
+
+.speaker-input, 
+.speaker {
+    width: 6em;
+}
+
+.speaker {
+    text-overflow: ellipsis;
+}
+
+.inline {
+    display: inline;
+}
+
+.text-input {
+    width: 100%;
+    resize: none;
+    outline: none;
+}
+
+.selected {
+    background-color: #0000000F;
+}
+</style>
