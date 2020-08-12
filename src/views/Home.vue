@@ -46,6 +46,7 @@
 <script>
 import download from 'downloadjs'
 import state from '@/state.js'
+import { cacheProject } from '@/utils/storage.js'
 
 const project = state.project;
 
@@ -56,7 +57,9 @@ export default {
 
   methods: {
     saveProject() {
-      download(JSON.stringify(state.project), state.project.info.name + '.proj.json', 'application/json');
+      const data = JSON.stringify(state.project);
+      download(data, state.project.info.name + '.proj.json', 'application/json');
+      cacheProject(project);
     },
 
     compile() {

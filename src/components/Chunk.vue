@@ -114,9 +114,6 @@
             </v-slide-y-transition>
         </v-toolbar>
 
-        
-
-
         <v-divider/>
 
         <!-- 具体段落 -->
@@ -133,6 +130,7 @@
                     :is-only="chunk.sections.length === 1"
                     @add-line="addLine"
                     @delete-line="deleteLine"
+                    @focus="focusOnSection"
                 />
             </template>
         </v-virtual-scroll>
@@ -231,6 +229,7 @@ import Section from '@/components/Section.vue'
         },
 
         focusOnSection(index) {
+            index = Math.max(0, Math.min(index, this.sections.length - 1));
             this.$refs.section[index].focus();
         },
     }

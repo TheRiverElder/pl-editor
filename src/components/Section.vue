@@ -49,6 +49,7 @@
                 ref="textInput"
                 class="text-input py-1"
                 v-model="section.text"
+                @keyup="handleInputKey"
             />
         </span>
 
@@ -162,6 +163,25 @@ export default {
                 this.section.speaker = state.chunkEditorBar.primaryRoleUid || this.section.speaker;
             }
         },
+
+        handleInputKey(event) {
+            let doPreventDefault = true;
+            switch(event.key) {
+                case 'Enter': this.$emit('add-line', this.index + 1); break;
+                case 'ArrowUp': this.$emit('focus', this.index - 1); break;
+                case 'ArrowDown': this.$emit('focus', this.index + 1); break;
+                case 'Backspace': {
+                    if (/^\s*$/.test(this.section.text)) {
+                        this.$emit('delete-line', this.index);
+                    }
+                } break;
+                default: doPreventDefault = false;
+            }
+
+            if (doPreventDefault) {
+                event.preventDefault();
+            }
+        }
     },
 
 }

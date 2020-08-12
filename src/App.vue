@@ -37,6 +37,7 @@ export default {
 
     currentPageIndex: 0,
   }),
+
 };
 </script>
 
