@@ -50,6 +50,8 @@ const state = {
             }
         },
     },
+
+    messages: ["打开新世界的大门"],
 };
 
 export default state;

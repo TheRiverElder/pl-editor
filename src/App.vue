@@ -1,7 +1,12 @@
 <template>
-  <v-app id="app">
-    <v-app-bar app color="primary">
+  <v-app id="app" @keyup="handleKeyUp">
+    <v-app-bar 
+      app 
+      color="primary"
+    >
       <v-tabs 
+        class="flex-grow-0 flex-shrink-1 width-fit"
+        style="width: fit-content"
         v-model="currentPageIndex" 
         color="white"
       >
@@ -12,6 +17,14 @@
           class="white--text"
         >{{ link.text }}</v-tab>
       </v-tabs>
+
+      <v-card 
+        class="flex-grow-1 pa-2 ma-2"
+        flat
+      >
+        <v-icon class="mr-2">mdi-information-outline</v-icon>
+        <span class="grey--text">{{ messages[messages.length - 1] }}</span>
+      </v-card>
     </v-app-bar>
 
     <v-main class="fill-y">
@@ -21,6 +34,8 @@
 </template>
 
 <script>
+import state from '@/state.js';
+import { saveProject } from '@/utils/actions.js';
 
 export default {
   name: 'App',
@@ -36,7 +51,19 @@ export default {
     ],
 
     currentPageIndex: 0,
+
+    messages: state.messages,
   }),
+
+  methods: {
+    handleKeyUp(event) {
+      if(event.key === 's' && event.ctrlKey) {
+        event.preventDefault();
+        event.stopPropagation();
+        saveProject(event.shiftKey);
+      }
+    },
+  },
 
 };
 </script>
@@ -46,6 +73,10 @@ export default {
     width: 100%;
     height: 100%;
     overflow: auto;
+  }
+
+  .width-fit {
+    width: fit-content;
   }
 
   .fill-y {

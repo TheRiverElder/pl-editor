@@ -5,12 +5,14 @@ function cacheProject(project) {
     if (project) {
         const data = JSON.stringify(project);
         localStorage.setItem(LS_KEY, data);
+        return data;
     }
 }
 
 function loadCachedProject() {
     return JSON.parse(localStorage.getItem(LS_KEY));
 }
+
 
 export {
     LS_KEY,
