@@ -1,5 +1,6 @@
 
 
+import { v4 as uuidv4 } from 'uuid'
 import state from '@/state.js'
 import download from "downloadjs";
 import { cacheProject } from "@/utils/storage.js";
@@ -88,10 +89,35 @@ function fillProject(proj) {
     }
 }
 
+const projectTemplate = {
+    info: {
+        name: '未命名剧本',
+        version: '1.0.0',
+        authors: ['RiverElder'],
+    },
+
+    data: {},
+    
+    chunks: [],
+    roles: [],
+    resources: [],
+
+    addData(newData) {
+        const uid = uuidv4();
+        this.data[uid] = newData;
+        return uid;
+    }
+};
+
+function clearProject() {
+    Object.assign(project, projectTemplate);
+}
+
 export {
     saveProject,
     compile,
     downloadScript,
     loadProject,
     fillProject,
+    clearProject,
 }

@@ -42,6 +42,10 @@
 
         <input class="fill" type="file" @input="loadProject" />
       </v-btn>
+
+      <v-btn @click="clearProject">
+        <v-icon>mdi-clear</v-icon>清空项目
+      </v-btn>
     </div>
 
     <article>
@@ -75,6 +79,7 @@ import {
   downloadScript,
   loadProject,
   fillProject,
+  clearProject,
 } from "@/utils/actions.js";
 
 export default {
@@ -88,6 +93,7 @@ export default {
     downloadScript,
     loadProject,
     fillProject,
+    clearProject,
   },
 }
 </script>

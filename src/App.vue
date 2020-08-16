@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app" @keyup="handleKeyUp">
+  <v-app id="app">
     <v-app-bar 
       app 
       color="primary"
@@ -55,16 +55,15 @@ export default {
     messages: state.messages,
   }),
 
-  methods: {
-    handleKeyUp(event) {
+  created() {
+    window.addEventListener('keydown', (event) => {
       if(event.key === 's' && event.ctrlKey) {
         event.preventDefault();
         event.stopPropagation();
         saveProject(event.shiftKey);
       }
-    },
-  },
-
+    })
+  }
 };
 </script>
 
