@@ -35,12 +35,16 @@
             <!-- 正文 -->
             <div class="fill-y flex-grow-1 d-flex flex-column">
                 <v-tabs class="flex-grow-0" v-model="tabIndex" height="2em">
-                    <v-tab v-for="tab of tabs" :key="tab.id" size="small">
+                    <v-tab 
+                        v-for="(tab, index) of tabs" 
+                        :key="tab.id" 
+                        size="small"
+                    >
                         <v-icon small>{{ getIcon(tab.type) }}</v-icon>
 
                         <span class="mx-1">{{ tab.title }}</span>
 
-                        <v-btn x-small icon>
+                        <v-btn x-small icon @click="close(index)">
                             <v-icon x-small>{{ tab.dirty ? 'mdi-circle' : 'mdi-close' }}</v-icon>
                         </v-btn>
                     </v-tab>
@@ -168,6 +172,22 @@ export default {
             this.tabIndex = this.tabs.length - 1;
         },
 
+        close(index) {
+            const tab = this.tabs[index];
+            if (tab) {
+                if (!tab.dirty || confirm(`${tab.title}还未保存，确定关闭？`)) {
+                    this.tabs.splice(index, 1);
+                }
+            }
+        },
+
+        saveTab(tab) {
+            if (tab && tab.content && tab.dirty) {
+                this.updateData(tab.content);
+                tab.dirty = false;
+            }
+        },
+
         markDirty(tab) {
             tab.dirty = true;
         },
@@ -175,13 +195,13 @@ export default {
 
     created() {
         window.addEventListener("keydown", (event) => {
-            if (event.key === "s" && event.ctrlKey) {
+            if ((event.key === 'S' || event.key ==='s') && event.ctrlKey) {
                 event.preventDefault();
                 event.stopPropagation();
-                const tab = this.tabs[this.tabIndex];
-                if (tab && tab.content) {
-                    this.updateData(tab.content);
-                    tab.dirty = false;
+                if (event.shiftKey) {
+                    this.tabs.forEach(tab => this.saveTab(tab));
+                } else {
+                    this.saveTab(this.tabs[this.tabIndex]);
                 }
             }
         });
