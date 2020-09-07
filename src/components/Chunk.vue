@@ -109,6 +109,7 @@
                 @add-line="addLine"
                 @delete-line="deleteLine"
                 @focus="focusOnSection"
+                @mutate="$emit('mutate')"
             />
             <!-- <v-virtual-scroll 
             class="content overflow-auto ma-0 px-15 py-2 flex-grow-1"
@@ -171,6 +172,27 @@ export default {
 
             openMenu: false,
         };
+    },
+    
+
+    watch: {
+        title(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.$emit('mutate');
+            }
+        },
+
+        subtitle(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.$emit('mutate');
+            }
+        },
+
+        background(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.$emit('mutate');
+            }
+        },
     },
 
     computed: {

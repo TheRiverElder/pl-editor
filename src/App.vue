@@ -41,7 +41,7 @@
                         <span class="mx-1">{{ tab.title }}</span>
 
                         <v-btn x-small icon>
-                            <v-icon x-small>mdi-circle</v-icon>
+                            <v-icon x-small>{{ tab.dirty ? 'mdi-circle' : 'mdi-close' }}</v-icon>
                         </v-btn>
                     </v-tab>
                 </v-tabs>
@@ -58,7 +58,11 @@
                         :key="tab.id"
                         class="grey lighten-4"
                     >
-                        <component :is="getComponent(tab.type)" :content="tab.content" />
+                        <component 
+                            :is="getComponent(tab.type)" 
+                            :content="tab.content" 
+                            @mutate="markDirty(tab)"
+                        />
                     </v-tab-item>
                 </v-tabs-items>
             </div>
@@ -67,7 +71,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 import ResourceManager from "./views/ResourceManager";
 import Role from "./components/Role.vue";
 import Chunk from "./components/Chunk.vue";
@@ -94,6 +98,8 @@ export default {
     },
 
     methods: {
+        ...mapMutations(['updateData']),
+
         getIcon(type) {
             switch (type) {
                 case "resource":
@@ -135,6 +141,7 @@ export default {
                     title: "资源管理器",
                     type,
                     id,
+                    dirty: false,
                 };
             } else {
                 const data = deepCopy(this.data[id]);
@@ -143,6 +150,7 @@ export default {
                     type,
                     id,
                     content: data,
+                    dirty: false,
                 };
                 switch (type) {
                     case "resource":
@@ -159,17 +167,25 @@ export default {
             this.tabs.push(tab);
             this.tabIndex = this.tabs.length - 1;
         },
+
+        markDirty(tab) {
+            tab.dirty = true;
+        },
     },
 
-    // created() {
-    //     window.addEventListener("keydown", (event) => {
-    //         if (event.key === "s" && event.ctrlKey) {
-    //             event.preventDefault();
-    //             event.stopPropagation();
-    //             saveProject(event.shiftKey);
-    //         }
-    //     });
-    // },
+    created() {
+        window.addEventListener("keydown", (event) => {
+            if (event.key === "s" && event.ctrlKey) {
+                event.preventDefault();
+                event.stopPropagation();
+                const tab = this.tabs[this.tabIndex];
+                if (tab && tab.content) {
+                    this.updateData(tab.content);
+                    tab.dirty = false;
+                }
+            }
+        });
+    },
 };
 </script>
 

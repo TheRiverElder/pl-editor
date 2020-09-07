@@ -85,11 +85,24 @@ export default {
 
     data() {
         return {
-            changingSpeaker: false,
             showBtnBar: false,
             speaker: null,
             text: '',
         };
+    },
+
+    watch: {
+        speaker(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.$emit('mutate');
+            }
+        },
+        
+        text(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.$emit('mutate');
+            }
+        },
     },
 
     computed: {

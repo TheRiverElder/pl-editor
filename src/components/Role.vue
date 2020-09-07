@@ -58,6 +58,26 @@ export default {
         };
     },
 
+    watch: {
+        name(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.$emit('mutate');
+            }
+        },
+
+        avatar(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.$emit('mutate');
+            }
+        },
+
+        pic(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.$emit('mutate');
+            }
+        },
+    },
+
     computed: {
         ...mapState(["data"]),
 
