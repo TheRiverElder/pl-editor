@@ -1,10 +1,13 @@
 
 import { v4 as genId } from 'uuid'
 
-function create(state, catalog, data) {
+function create(state, catalog, data, cb) {
     const newData = { id: genId(), ...data };
     state.data[newData.id] = newData;
     state[catalog].push(newData.id);
+    if (cb) {
+        cb(newData);
+    }
 }
 
 // 增加资源
@@ -12,8 +15,9 @@ function createResource(state, {
     name = '未命名资源',
     src = null,
     type = 'image/*',
+    cb,
 } = {}) {
-    create(state, 'resources', { name, src, type });
+    create(state, 'resources', { name, src, type }, cb);
 }
 
 // 增加角色
@@ -21,8 +25,9 @@ function createRole(state, {
     name = '未命名角色',
     avatar = null,
     pic = null,
+    cb,
 } = {}) {
-    create(state, 'roles', { name, avatar, pic });
+    create(state, 'roles', { name, avatar, pic }, cb);
 }
 
 // 增加文本段
@@ -33,8 +38,9 @@ function createChunk(state, {
     // bgm: null,
     sections = [{ speaker: null, text: '' }],
     exits = [],
+    cb,
 } = {}) {
-    create(state, 'chunks', { title, subtitle, background, sections, exits });
+    create(state, 'chunks', { title, subtitle, background, sections, exits }, cb);
 }
 
 

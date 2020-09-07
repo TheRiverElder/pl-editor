@@ -1,15 +1,6 @@
 <template>
-    <div class="chunk fill">
-        <!-- 背景预览 -->
-        <v-img
-            class="background"
-            cover
-            width="100%"
-            gradient="#ffffffaf 0%, #ffffffaf 50%, #fff 100%"
-            :src="backgroundUrl"
-        />
-
-        <v-container class="fill pa-0 d-flex flex-column">
+    <div class="chunk fill pa-5">
+        <v-container class="pa-0 d-flex flex-column">
 
             <div class="text-right ma-1" @mouseleave="openMenu = false">
                 <v-slide-x-reverse-transition>
@@ -25,7 +16,16 @@
                 />
             </div>
 
-            <div class="chunkInfo px-15">
+            <div class="chunk-info px-15">
+                <!-- 背景预览 -->
+                <img
+                    class="background"
+                    cover
+                    width="100%"
+                    gradient="#ffffffaf 0%, #ffffffaf 50%, #fff 100%"
+                    :src="backgroundUrl"
+                />
+
                 <!-- 输入标题 -->
                 <v-row align="baseline">
                     <v-col cols="2">标题</v-col>
@@ -88,10 +88,12 @@
                     </v-row>
                 </v-container>
             </div>
+        </v-container>
 
-            <v-divider />
+        <v-divider />
 
-            <!-- 具体段落 -->
+        <!-- 具体段落 -->
+        <div class="content">
             <Section
                 ref="section"
                 v-for="(sec, index) of sections"
@@ -104,7 +106,8 @@
                 @focus="focusOnSection"
                 @mutate="$emit('mutate')"
             />
-            <!-- <v-virtual-scroll 
+        </div>
+        <!-- <v-virtual-scroll 
             class="content overflow-auto ma-0 px-15 py-2 flex-grow-1"
             item-height="35"
             :items="sections"
@@ -122,18 +125,17 @@
             </template>
             </v-virtual-scroll>-->
 
-            <v-row class="flex-grow-0 pa-2">
-                <v-btn 
-                    class="mx-auto"
-                    ref="btnAdd" 
-                    color="primary" 
-                    @click="addLine" 
-                    elevation="0"
-                >
-                    <v-icon>mdi-plus</v-icon>新台词
-                </v-btn>
-            </v-row>
-        </v-container>
+        <v-row class="flex-grow-0 pa-2">
+            <v-btn 
+                class="mx-auto"
+                ref="btnAdd" 
+                color="primary" 
+                @click="addLine" 
+                elevation="0"
+            >
+                <v-icon>mdi-plus</v-icon>新台词
+            </v-btn>
+        </v-row>
     </div>
 </template>
 
@@ -192,7 +194,7 @@ export default {
     },
 
     methods: {
-        ...mapMutations(["removeChunk"]),
+        ...mapMutations(["removeChunk", 'updateData']),
 
         addLine(index) {
             if ("number" !== typeof index || index < 0 || index > this.sections.length) {
@@ -256,35 +258,25 @@ export default {
     z-index: 1;
     position: relative;
     overflow: hidden;
+}
 
-    .topbar {
-        z-index: 6;
-        position: relative;
+.chunk-info {
+    background-color: #ffffff80;
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
 
-        * {
-            z-index: 6;
-        }
-
-        .chunkInfo {
-            margin-left: 1em;
-            position: absolute;
-            top: 100%;
-            width: 100%;
-            background-color: #ffffffd0;
-            backdrop-filter: blur(5px);
-        }
+    * {
+        z-index: 2;
     }
 
     .background {
         position: absolute;
-    }
-
-    .content {
-        z-index: 2;
-
-        * {
-            z-index: 2;
-        }
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 0;
+        filter: opacity(20%);
     }
 }
 

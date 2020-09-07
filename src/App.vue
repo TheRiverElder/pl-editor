@@ -13,7 +13,7 @@
                     <v-list-item-title>资源管理器</v-list-item-title>
                 </v-list-item>
 
-                <v-list-group dense>
+                <v-list-group>
                     <template v-slot:activator>
                         <v-list-item-subtitle>角色</v-list-item-subtitle>
                     </template>
@@ -25,15 +25,33 @@
 
                         <v-list-item-title>{{ data[id].name }}</v-list-item-title>
                     </v-list-item>
+
+                    <v-list-item>
+                        <v-btn 
+                            text 
+                            class="mx-auto" 
+                            color="primary"
+                            @click="createNewRole"
+                        >新建角色</v-btn>
+                    </v-list-item>
                 </v-list-group>
 
-                <v-list-group dense>
+                <v-list-group>
                     <template v-slot:activator>
                         <v-list-item-subtitle>台词段</v-list-item-subtitle>
                     </template>
 
                     <v-list-item v-for="id of chunks" :key="id" @click="open('chunk', id)">
                         <v-list-item-title>{{ data[id].title }}</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item>
+                        <v-btn 
+                            text 
+                            class="mx-auto" 
+                            color="primary"
+                            @click="createNewChunk"
+                        >新建文本段</v-btn>
                     </v-list-item>
                 </v-list-group>
             </v-list>
@@ -61,15 +79,16 @@
                 <v-divider />
 
                 <v-tabs-items 
-                    class="grey lighten-4 flex-grow-1 overflow-auto" 
+                    class="grey lighten-4 flex-grow-1" 
                     v-model="tabIndex"
                 >
                     <v-tab-item 
                         v-for="tab of tabs" 
                         :key="tab.id"
-                        class="grey lighten-4"
+                        class="fill-y grey lighten-4"
                     >
                         <component 
+                            class="fill-y edit-area"
                             :is="getComponent(tab.type)" 
                             :content="tab.content" 
                             @mutate="markDirty(tab)"
@@ -112,7 +131,15 @@ export default {
     },
 
     methods: {
-        ...mapMutations(['updateData', 'cacheState']),
+        ...mapMutations(['updateData', 'cacheState', 'createRole', 'createChunk']),
+
+        createNewRole() {
+            this.createRole({cb: role => this.open('role', role.id)});
+        },
+
+        createNewChunk() {
+            this.createChunk({cb: role => this.open('chunk', role.id)});
+        },
 
         getIcon(type) {
             switch (type) {
@@ -234,5 +261,11 @@ body,
 
 input[type="text"] {
     padding: 5px;
+}
+
+.edit-area {
+    width: 100%;
+    max-width: 64em;
+    margin: 0 auto;
 }
 </style>
