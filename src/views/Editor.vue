@@ -65,7 +65,7 @@
 
             <v-divider/>
 
-            <v-tabs-items class="flex-grow-1 overflow-auto" v-model="tabIndex">
+            <v-tabs-items class="inner-fill-y flex-grow-1 overflow-auto" v-model="tabIndex">
                 <v-tab-item
                     v-for="tab of tabs"
                     :key="tab.id" 

@@ -74,6 +74,7 @@ export default {
 </script>
 
 <style>
+
   html, body, #app {
     width: 100%;
     height: 100%;
@@ -84,7 +85,8 @@ export default {
     width: fit-content;
   }
 
-  .fill-y {
+  .fill-y,
+  .inner-fill-y > * {
     height: 100%;
   }
 

@@ -1,5 +1,9 @@
 <template>
     <v-select
+        :label="label"
+        :messages="messages"
+        :placeholder="placeholder"
+        :no-data-text="noDataText || '无可用资源'"
         :items="resList"
         v-model="resId"
         item-text="name"
@@ -17,6 +21,10 @@ export default {
 
     props: {
         value: String,
+        messages: [Array, String],
+        label: String,
+        placeholder: String,
+        noDataText: String,
     },
 
     data() {
