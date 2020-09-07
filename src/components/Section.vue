@@ -1,10 +1,9 @@
 <template>
     <div
-        :class="'section d-flex align-start' + (selected ? ' selected' : '')"
+        class="section d-flex align-start"
         align="start"
         @mouseenter="showBtnBar = true"
         @mouseleave="showBtnBar = false"
-        @click.shift.exact.stop="handleClick"
     >
         <span class="mt-2 d-flex align-center">
             <!-- 行号 -->
@@ -64,11 +63,10 @@
 </template>
 
 <script>
-import state from '@/state.js'
 
 import RoleSelector from './RoleSelector.vue'
-
-const project = state.project;
+import { mutateWatcher } from '../utils/vue-util'
+import { mapState } from 'vuex';
 
 export default {
     name: 'Section',
@@ -85,36 +83,23 @@ export default {
 
     data() {
         return {
-            showBtnBar: false,
             speaker: null,
             text: '',
+            
+            showBtnBar: false,
         };
     },
 
     watch: {
-        speaker(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                this.$emit('mutate');
-            }
-        },
-        
-        text(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                this.$emit('mutate');
-            }
-        },
+        ...mutateWatcher('section', 'speaker', 'text'),
     },
 
     computed: {
-        data: () => project.data,
-        
-        roleList() {
-            return project.roles.map(uid => ({uid, ...project.data[uid]}));
-        },
+        ...mapState(['data']),
 
         speakerName() {
-            if (this.section.speaker) {
-                const role = project.data[this.section.speaker];
+            if (this.speaker) {
+                const role = this.data[this.speaker];
                 if (role && role.pic) {
                     return role.name;
                 }
@@ -123,10 +108,10 @@ export default {
         },
 
         speakerPicUrl() {
-            if (this.section.speaker) {
-                const role = project.data[this.section.speaker];
+            if (this.speaker) {
+                const role = this.data[this.speaker];
                 if (role) {
-                    const res = project.data[role.avatar || role.pic];
+                    const res = this.data[role.avatar || role.pic];
                     if (res) {
                         return res.src;
                     }
@@ -134,27 +119,11 @@ export default {
             }
             return null;
         },
-
-        selected() {
-            return state.chunkEditorBar.selectState.has(this.index);
-        },
     },
 
     methods: {
         focus() {
             this.$refs.textInput.focus();
-        },
-
-        handleClick() {
-            if (state.chunkEditorBar.clickMode === 'select') {
-                if (state.chunkEditorBar.selectState.has(this.index)) {
-                    state.chunkEditorBar.selectState.delete(this.index);
-                } else {
-                    state.chunkEditorBar.selectState.add(this.index);
-                }
-            } else if (state.chunkEditorBar.clickMode === 'fill') {
-                this.section.speaker = state.chunkEditorBar.primaryRoleUid || this.section.speaker;
-            }
         },
 
         handleInputKey(event) {

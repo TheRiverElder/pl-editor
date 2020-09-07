@@ -5,8 +5,12 @@
         <!-- 侧边栏或者叫目录 -->
         <v-navigation-drawer app permanent clipped>
             <v-list>
+                <v-list-item @click="open('base-info')">
+                    <v-list-item-title>基础信息</v-list-item-title>
+                </v-list-item>
+
                 <v-list-item @click="open('resource')">
-                    <v-list-item-title>资源</v-list-item-title>
+                    <v-list-item-title>资源管理器</v-list-item-title>
                 </v-list-item>
 
                 <v-list-group dense>
@@ -14,7 +18,11 @@
                         <v-list-item-subtitle>角色</v-list-item-subtitle>
                     </template>
 
-                    <v-list-item v-for="id of roles" :key="id" dense @click="open('role', id)">
+                    <v-list-item v-for="id of roles" :key="id" @click="open('role', id)">
+                        <v-list-item-avatar color="grey lighten-2">
+                            <v-img :src="data[data[id].avatar]"/>
+                        </v-list-item-avatar>
+
                         <v-list-item-title>{{ data[id].name }}</v-list-item-title>
                     </v-list-item>
                 </v-list-group>
@@ -24,7 +32,7 @@
                         <v-list-item-subtitle>台词段</v-list-item-subtitle>
                     </template>
 
-                    <v-list-item v-for="id of chunks" :key="id" dense @click="open('chunk', id)">
+                    <v-list-item v-for="id of chunks" :key="id" @click="open('chunk', id)">
                         <v-list-item-title>{{ data[id].title }}</v-list-item-title>
                     </v-list-item>
                 </v-list-group>
@@ -54,7 +62,6 @@
 
                 <v-tabs-items 
                     class="grey lighten-4 flex-grow-1 overflow-auto" 
-                    continuous 
                     v-model="tabIndex"
                 >
                     <v-tab-item 
@@ -66,6 +73,7 @@
                             :is="getComponent(tab.type)" 
                             :content="tab.content" 
                             @mutate="markDirty(tab)"
+                            ref="tabs"
                         />
                     </v-tab-item>
                 </v-tabs-items>
@@ -79,6 +87,7 @@ import { mapMutations, mapState } from "vuex";
 import ResourceManager from "./views/ResourceManager";
 import Role from "./components/Role.vue";
 import Chunk from "./components/Chunk.vue";
+import BaseInfo from "./components/BaseInfo.vue";
 import { deepCopy } from "./utils/objects";
 
 export default {
@@ -88,6 +97,7 @@ export default {
         ResourceManager,
         Role,
         Chunk,
+        BaseInfo,
     },
 
     data() {
@@ -102,7 +112,7 @@ export default {
     },
 
     methods: {
-        ...mapMutations(['updateData']),
+        ...mapMutations(['updateData', 'cacheState']),
 
         getIcon(type) {
             switch (type) {
@@ -126,13 +136,13 @@ export default {
                 case "chunk":
                     return "Chunk";
                 default:
-                    return "mdi-help";
+                    return "BaseInfo";
             }
         },
 
         open(type, id) {
-            if (type === "resource") {
-                id = "resource";
+            if (type === "resource" || type === 'base-info') {
+                id = type;
             }
             const index = this.tabs.findIndex((t) => t.id === id);
             if (index >= 0) {
@@ -140,7 +150,7 @@ export default {
                 return;
             }
             let tab = null;
-            if (type === "resource") {
+            if (type === "resource" || type === 'base-info') {
                 tab = {
                     title: "资源管理器",
                     type,
@@ -157,15 +167,8 @@ export default {
                     dirty: false,
                 };
                 switch (type) {
-                    case "resource":
-                        tab.title = data.name;
-                        break;
-                    case "role":
-                        tab.title = data.name;
-                        break;
-                    case "chunk":
-                        tab.title = data.title;
-                        break;
+                    case "role": tab.title = data.name; break;
+                    case "chunk": tab.title = data.title; break;
                 }
             }
             this.tabs.push(tab);
@@ -181,9 +184,9 @@ export default {
             }
         },
 
-        saveTab(tab) {
-            if (tab && tab.content && tab.dirty) {
-                this.updateData(tab.content);
+        saveTab(tab, index) {
+            if (tab && tab.dirty) {
+                this.$refs.tabs[index].save();
                 tab.dirty = false;
             }
         },
@@ -199,10 +202,12 @@ export default {
                 event.preventDefault();
                 event.stopPropagation();
                 if (event.shiftKey) {
-                    this.tabs.forEach(tab => this.saveTab(tab));
+                    this.tabs.forEach((tab, index) => this.saveTab(tab, index));
                 } else {
-                    this.saveTab(this.tabs[this.tabIndex]);
+                    this.saveTab(this.tabs[this.tabIndex], this.tabIndex);
                 }
+                this.cacheState();
+                this.$forceUpdate();
             }
         });
     },

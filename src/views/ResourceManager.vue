@@ -12,6 +12,7 @@
             :uid="uid"
             :res="data[uid]"
         />
+
         <v-card class="resource ma-3 d-flex flex-column">
             <div class="input-wrapper flex-grow-1 flex-shrink-1 d-flex justify-center align-center">
                 <v-icon x-large>mdi-file-multiple</v-icon>
@@ -22,7 +23,7 @@
             <v-card-subtitle>拖拽或点击输入文件</v-card-subtitle>
         </v-card>
 
-        <v-overlay :value="false" class="fill ma-auto" absolute>
+        <!-- <v-overlay :value="false" class="fill ma-auto" absolute>
             <div class="overlay input-wrapper d-flex flex-column justify-center align-center">
                 <v-icon size="100">mdi-file-multiple</v-icon>
 
@@ -30,7 +31,7 @@
 
                 <input type="file" multiple @change="inputFiles" />
             </div>
-        </v-overlay>
+        </v-overlay> -->
     </v-container>
 </template>
 
@@ -45,9 +46,11 @@ export default {
         Resouece,
     },
 
-    data: () => ({
-        overlay: false,
-    }),
+    data() {
+        return {
+            overlay: false,
+        };
+    },
     
     computed: {
         ...mapState(["resources", "data"]),
@@ -62,13 +65,17 @@ export default {
                 const name = dotIndex >= 0 ? file.name.slice(0, dotIndex) : file.name;
 
                 const reader = new FileReader();
-                reader.onload = () => this.createResource({ name, src: reader.result });
+                reader.onload = () => this.createResource({ name, src: reader.result, type: file.type });
                 reader.readAsDataURL(file);
             }
         },
 
         handleDrop() {
             this.overlay = false;
+        },
+
+        save() {
+            // nop
         },
     },
 };

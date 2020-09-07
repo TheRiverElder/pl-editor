@@ -9,7 +9,7 @@ function compile(state) {
 
   // 缓存工程
 function cacheState(state) {
-    localStorage.setItem(LS_KEY, state);
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
 }
 
   // 下载工程

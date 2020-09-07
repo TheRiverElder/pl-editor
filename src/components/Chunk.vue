@@ -56,16 +56,9 @@
                 <v-row align="baseline">
                     <v-col cols="2">背景</v-col>
                     <v-col cols="10">
-                        <v-autocomplete
-                            dense
-                            hide-details="auto"
-                            no-data-text="无可用资源"
-                            class="text-subtitle-1"
-                            :items="resList"
-                            item-text="name"
-                            item-value="uid"
-                            v-model="background"
+                        <ResSelector 
                             placeholder="选择背景"
+                            v-model="background"
                         />
                     </v-col>
                 </v-row>
@@ -146,6 +139,8 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
+import { mutateWatcher } from '../utils/vue-util'
+import ResSelector from './ResSelector'
 
 import Section from "./Section.vue";
 
@@ -154,6 +149,7 @@ export default {
 
     components: {
         Section,
+        ResSelector
     },
 
     props: {
@@ -176,31 +172,11 @@ export default {
     
 
     watch: {
-        title(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                this.$emit('mutate');
-            }
-        },
-
-        subtitle(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                this.$emit('mutate');
-            }
-        },
-
-        background(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                this.$emit('mutate');
-            }
-        },
+        ...mutateWatcher('content', 'title', 'subtitle', 'background'),
     },
 
     computed: {
-        ...mapState(["data", "resources", "chunks"]),
-
-        resList() {
-            return this.resources.map((uid) => this.data[uid]);
-        },
+        ...mapState(["data", "chunks"]),
 
         chunkList() {
             return this.chunks.map((uid) => this.data[uid]);
@@ -219,21 +195,19 @@ export default {
         ...mapMutations(["removeChunk"]),
 
         addLine(index) {
-            if (
-                "number" !== typeof index ||
-                index < 0 ||
-                index > this.sections.length
-            ) {
+            if ("number" !== typeof index || index < 0 || index > this.sections.length) {
                 index = this.sections.length;
             }
             const speaker = index ? this.sections[index - 1].speaker : null;
             const section = { speaker, text: "" };
             this.sections.splice(index, 0, section);
+            this.$emit('mutate');
             this.$nextTick(() => this.focusOnSection(index));
         },
 
         deleteLine(index) {
             this.sections.splice(index, 1);
+            this.$emit('mutate');
             this.$nextTick(() => this.focusOnSection(index - 1));
         },
 
@@ -242,10 +216,12 @@ export default {
                 text: "",
                 target: null,
             });
+            this.$emit('mutate');
         },
 
         deleteExit(index) {
             this.exits.splice(index, 1);
+            this.$emit('mutate');
         },
 
         deleteSelf() {
@@ -258,6 +234,18 @@ export default {
             if (list.length && index < list.length) {
                 list[index].focus();
             }
+        },
+
+        save() {
+            this.updateData({
+                id: this.content.id,
+                title: this.title,
+                subtitle: this.subtitle,
+                background: this.background,
+                // bgm: null,
+                sections: this.sections,
+                exits: this.exits,
+            });
         },
     },
 };

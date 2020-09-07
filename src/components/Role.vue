@@ -37,7 +37,9 @@
 
 <script>
 import ResSelector from "./ResSelector.vue";
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
+import { mutateWatcher } from '../utils/vue-util'
+
 
 export default {
     name: "Role",
@@ -59,27 +61,15 @@ export default {
     },
 
     watch: {
-        name(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                this.$emit('mutate');
-            }
-        },
-
-        avatar(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                this.$emit('mutate');
-            }
-        },
-
-        pic(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                this.$emit('mutate');
-            }
-        },
+        ...mutateWatcher('content', 'name', 'avatar', 'pic'),
     },
 
     computed: {
         ...mapState(["data"]),
+
+        id() {
+            return this.content.id;
+        },
 
         picUrl() {
             const res = this.data[this.pic];
@@ -89,6 +79,19 @@ export default {
         avatarUrl() {
             const res = this.data[this.avatar];
             return res ? res.src : null;
+        },
+    },
+
+    methods: {
+        ...mapMutations(['updateData']),
+
+        save() {
+            this.updateData({
+                id: this.id,
+                name: this.name,
+                avatar: this.avatar,
+                pic: this.pic,
+            });
         },
     },
 };

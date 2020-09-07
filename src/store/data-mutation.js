@@ -63,7 +63,7 @@ function removeChunk(state, id) {
 // 更新数据
 function updateData(state, newData) {
   let oldData = state.data[newData.id];
-  if (!oldData) {
+  if (oldData) {
     Object.assign(oldData, newData);
   } else {
     state.data[newData.id] = newData;
