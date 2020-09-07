@@ -43,14 +43,23 @@
 
         <!-- 正文 -->
         <div class="fill-y flex-grow-1 d-flex flex-column">
-            <v-tabs class="flex-grow-0" v-model="tabIndex">
+            <v-tabs 
+                class="flex-grow-0" 
+                v-model="tabIndex"
+                height="2em"
+            >
                 <v-tab
                     v-for="tab of tabs"
                     :key="tab.id" 
                     size="small"
                 >
-                    <v-icon class="mr-1">{{ getIcon(tab.type) }}</v-icon>
-                    <span>{{ tab.title }}</span>
+                    <v-icon small>{{ getIcon(tab.type) }}</v-icon>
+
+                    <span class="mx-1">{{ tab.title }}</span>
+                    
+                    <v-btn x-small icon>
+                        <v-icon x-small>mdi-circle</v-icon>
+                    </v-btn>
                 </v-tab>
             </v-tabs>
 
@@ -74,6 +83,7 @@
 <script>
 import { mapState } from 'vuex'
 import ResourceManager from './ResourceManager';
+import Role from '../components/Role.vue';
 import Chunk from '../components/Chunk.vue';
 import { deepCopy } from '../utils/objects'
 
@@ -82,6 +92,7 @@ export default {
 
     components: {
         ResourceManager,
+        Role,
         Chunk,
     },
 
@@ -109,7 +120,7 @@ export default {
         getComponent(type) {
             switch(type) {
                 case 'resource': return 'ResourceManager';
-                case 'role': return 'ResourceManager';
+                case 'role': return 'Role';
                 case 'chunk': return 'Chunk';
                 default: return 'mdi-help';
             }
