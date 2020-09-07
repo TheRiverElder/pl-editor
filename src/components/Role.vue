@@ -1,9 +1,12 @@
 <template>
     <!-- 角色展示 -->
-    <div class="fill-y ma-5 d-flex">
+    <div class="ma-5 d-flex">
         <div class="form d-flex flex-column align-start">
             <!-- 头像预览 -->
-            <v-avatar size="160">
+            <v-avatar 
+                size="160"
+                color="#eee"
+            >
                 <img v-if="avatar" :src="avatarUrl" />
 
                 <span v-else>{{ name }}</span>

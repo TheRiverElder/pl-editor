@@ -65,7 +65,7 @@
 
             <v-divider/>
 
-            <v-tabs-items class="inner-fill-y flex-grow-1 overflow-auto" v-model="tabIndex">
+            <v-tabs-items class="flex-grow-1 overflow-auto" v-model="tabIndex">
                 <v-tab-item
                     v-for="tab of tabs"
                     :key="tab.id" 
@@ -133,27 +133,29 @@ export default {
             if (this.tabs.findIndex(t => t.id === id) >= 0) {
                 return;
             }
+            let tab = null;
             if (type === 'resource') {
-                this.tabs.push({
+                tab = {
                     title: '资源管理器',
                     type,
                     id,
-                });
-                return;
-            }
-            const data = deepCopy(this.data[id]);
-            let tab = {
-                title: null,
-                type,
-                id,
-                content: data,
-            };
-            switch(type) {
-                case 'resource': tab.title = data.name; break
-                case 'role': tab.title = data.name; break
-                case 'chunk': tab.title = data.title; break
+                };
+            } else {
+                const data = deepCopy(this.data[id]);
+                tab = {
+                    title: null,
+                    type,
+                    id,
+                    content: data,
+                };
+                switch(type) {
+                    case 'resource': tab.title = data.name; break
+                    case 'role': tab.title = data.name; break
+                    case 'chunk': tab.title = data.title; break
+                }
             }
             this.tabs.push(tab);
+            this.tabIndex = this.tabs.length - 1;
         }
     },
 
