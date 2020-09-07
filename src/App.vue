@@ -1,6 +1,37 @@
 <template>
     <v-app id="app">
-        <v-app-bar app color="primary" height="32" clipped-left></v-app-bar>
+        <v-app-bar app color="primary" height="32" clipped-left>
+            <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                        text
+                        height="32"
+                        tile
+                    >文件</v-btn>
+                </template>
+
+                <v-list>
+                    <v-list-item dense @click="downloadProject">
+                        <v-list-item-title>下载工程</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item dense @click="downloadScript" :disabled="!script">
+                        <v-list-item-title>下载脚本</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item dense @click="cacheState">
+                        <v-list-item-title>缓存至浏览器</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item dense disabled>
+                        <v-list-item-title>读取浏览器缓存</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
+        </v-app-bar>
 
         <!-- 侧边栏或者叫目录 -->
         <v-navigation-drawer app permanent clipped>
@@ -81,6 +112,7 @@
                 <v-tabs-items 
                     class="grey lighten-4 flex-grow-1" 
                     v-model="tabIndex"
+                    active-class=""
                 >
                     <v-tab-item 
                         v-for="tab of tabs" 
@@ -127,11 +159,12 @@ export default {
     },
 
     computed: {
-        ...mapState(["resources", "roles", "chunks", "data"]),
+        ...mapState(["resources", "roles", "chunks", "data", 'script']),
     },
 
     methods: {
-        ...mapMutations(['updateData', 'cacheState', 'createRole', 'createChunk']),
+        ...mapMutations(['updateData', 'cacheState', 'createRole', 'createChunk',
+            'downloadProject', 'downloadScript', 'compile']),
 
         createNewRole() {
             this.createRole({cb: role => this.open('role', role.id)});
@@ -212,7 +245,7 @@ export default {
         },
 
         saveTab(tab, index) {
-            if (tab && tab.dirty) {
+            if (tab) {
                 this.$refs.tabs[index].save();
                 tab.dirty = false;
             }
