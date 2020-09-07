@@ -36,7 +36,7 @@
 
 <script>
 import Resouece from "@/components/Resource.vue";
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 
 export default {
     name: "ResourceManager",
@@ -48,9 +48,13 @@ export default {
     data: () => ({
         overlay: false,
     }),
+    
+    computed: {
+        ...mapState(["resources", "data"]),
+    },
 
     methods: {
-        ...mapState(["resources", "data", "createResource"]),
+        ...mapMutations(["createResource"]),
 
         inputFiles(event) {
             for (const file of event.target.files) {

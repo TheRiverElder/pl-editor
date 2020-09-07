@@ -1,96 +1,197 @@
 <template>
-  <v-app id="app">
-    <v-app-bar 
-      app 
-      color="primary"
-    >
-      <!-- <v-tabs 
-        class="flex-grow-0 flex-shrink-1 width-fit"
-        style="width: fit-content"
-        v-model="currentPageIndex" 
-        color="white"
-      >
-        <v-tab 
-          v-for="link of links"
-          :key="link.to"
-          :to="link.to"
-          class="white--text"
-        >{{ link.text }}</v-tab>
-      </v-tabs>
+    <v-app id="app">
+        <v-app-bar app color="primary" height="32" clipped-left></v-app-bar>
 
-      <v-card 
-        class="flex-grow-1 pa-2 ma-2"
-        flat
-      >
-        <v-icon class="mr-2">mdi-information-outline</v-icon>
-        <span class="grey--text">{{ messages[messages.length - 1] }}</span>
-      </v-card> -->
-    </v-app-bar>
+        <!-- 侧边栏或者叫目录 -->
+        <v-navigation-drawer app permanent clipped>
+            <v-list>
+                <v-list-item @click="open('resource')">
+                    <v-list-item-title>资源</v-list-item-title>
+                </v-list-item>
 
-    <v-main class="fill-y">
-      <!-- <router-view/> -->
-      <Editor class="fill-y" />
-    </v-main>
-  </v-app>
+                <v-list-group dense>
+                    <template v-slot:activator>
+                        <v-list-item-subtitle>角色</v-list-item-subtitle>
+                    </template>
+
+                    <v-list-item v-for="id of roles" :key="id" dense @click="open('role', id)">
+                        <v-list-item-title>{{ data[id].name }}</v-list-item-title>
+                    </v-list-item>
+                </v-list-group>
+
+                <v-list-group dense>
+                    <template v-slot:activator>
+                        <v-list-item-subtitle>台词段</v-list-item-subtitle>
+                    </template>
+
+                    <v-list-item v-for="id of chunks" :key="id" dense @click="open('chunk', id)">
+                        <v-list-item-title>{{ data[id].title }}</v-list-item-title>
+                    </v-list-item>
+                </v-list-group>
+            </v-list>
+        </v-navigation-drawer>
+
+        <v-main class="fill-y">
+            <!-- 正文 -->
+            <div class="fill-y flex-grow-1 d-flex flex-column">
+                <v-tabs class="flex-grow-0" v-model="tabIndex" height="2em">
+                    <v-tab v-for="tab of tabs" :key="tab.id" size="small">
+                        <v-icon small>{{ getIcon(tab.type) }}</v-icon>
+
+                        <span class="mx-1">{{ tab.title }}</span>
+
+                        <v-btn x-small icon>
+                            <v-icon x-small>mdi-circle</v-icon>
+                        </v-btn>
+                    </v-tab>
+                </v-tabs>
+
+                <v-divider />
+
+                <v-tabs-items 
+                    class="grey lighten-4 flex-grow-1 overflow-auto" 
+                    continuous 
+                    v-model="tabIndex"
+                >
+                    <v-tab-item 
+                        v-for="tab of tabs" 
+                        :key="tab.id"
+                        class="grey lighten-4"
+                    >
+                        <component :is="getComponent(tab.type)" :content="tab.content" />
+                    </v-tab-item>
+                </v-tabs-items>
+            </div>
+        </v-main>
+    </v-app>
 </template>
 
 <script>
-import state from '@/state.js';
-import { saveProject } from '@/utils/actions.js';
-import Editor from './views/Editor.vue';
+import { mapState } from "vuex";
+import ResourceManager from "./views/ResourceManager";
+import Role from "./components/Role.vue";
+import Chunk from "./components/Chunk.vue";
+import { deepCopy } from "./utils/objects";
 
 export default {
-  name: 'App',
+    name: "App",
 
-  components: {
-    Editor,
-  },
+    components: {
+        ResourceManager,
+        Role,
+        Chunk,
+    },
 
-  data: () => ({
-    links: [
-      {to: '/', text: '主页'},
-      {to: '/resource-manager', text: '资源'},
-      {to: '/role-manager', text: '角色'},
-      {to: '/chunk-manager', text: '台词'},
-      {to: '/inject-page', text: '注入'},
-      {to: '/demonstration', text: '演示'},
-    ],
+    data() {
+        return {
+            tabIndex: null,
+            tabs: [],
+        };
+    },
 
-    currentPageIndex: 0,
+    computed: {
+        ...mapState(["resources", "roles", "chunks", "data"]),
+    },
 
-    messages: state.messages,
-  }),
+    methods: {
+        getIcon(type) {
+            switch (type) {
+                case "resource":
+                    return "mdi-file-outline";
+                case "role":
+                    return "mdi-account-outline";
+                case "chunk":
+                    return "mdi-text";
+                default:
+                    return "mdi-help";
+            }
+        },
 
-  created() {
-    window.addEventListener('keydown', (event) => {
-      if(event.key === 's' && event.ctrlKey) {
-        event.preventDefault();
-        event.stopPropagation();
-        saveProject(event.shiftKey);
-      }
-    })
-  }
+        getComponent(type) {
+            switch (type) {
+                case "resource":
+                    return "ResourceManager";
+                case "role":
+                    return "Role";
+                case "chunk":
+                    return "Chunk";
+                default:
+                    return "mdi-help";
+            }
+        },
+
+        open(type, id) {
+            if (type === "resource") {
+                id = "resource";
+            }
+            const index = this.tabs.findIndex((t) => t.id === id);
+            if (index >= 0) {
+                this.tabIndex = index;
+                return;
+            }
+            let tab = null;
+            if (type === "resource") {
+                tab = {
+                    title: "资源管理器",
+                    type,
+                    id,
+                };
+            } else {
+                const data = deepCopy(this.data[id]);
+                tab = {
+                    title: null,
+                    type,
+                    id,
+                    content: data,
+                };
+                switch (type) {
+                    case "resource":
+                        tab.title = data.name;
+                        break;
+                    case "role":
+                        tab.title = data.name;
+                        break;
+                    case "chunk":
+                        tab.title = data.title;
+                        break;
+                }
+            }
+            this.tabs.push(tab);
+            this.tabIndex = this.tabs.length - 1;
+        },
+    },
+
+    // created() {
+    //     window.addEventListener("keydown", (event) => {
+    //         if (event.key === "s" && event.ctrlKey) {
+    //             event.preventDefault();
+    //             event.stopPropagation();
+    //             saveProject(event.shiftKey);
+    //         }
+    //     });
+    // },
 };
 </script>
 
 <style>
-
-  html, body, #app {
+html,
+body,
+#app {
     width: 100%;
     height: 100%;
     overflow: auto;
-  }
+}
 
-  .width-fit {
+.width-fit {
     width: fit-content;
-  }
+}
 
-  .fill-y,
-  .inner-fill-y > * {
+.fill-y,
+.inner-fill-y > * {
     height: 100%;
-  }
+}
 
-  input[type=text] {
+input[type="text"] {
     padding: 5px;
-  }
+}
 </style>

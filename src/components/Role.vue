@@ -1,15 +1,15 @@
 <template>
     <!-- 角色展示 -->
     <div class="ma-5 d-flex">
-        <div class="form d-flex flex-column align-start">
+        <div class="form d-flex flex-column align-center">
             <!-- 头像预览 -->
             <v-avatar 
                 size="160"
-                color="#eee"
+                color="grey"
             >
                 <img v-if="avatar" :src="avatarUrl" />
 
-                <span v-else>{{ name }}</span>
+                <span v-else class="white--text text-h3">{{ name.slice(0, 2) }}</span>
             </v-avatar>
 
             <!-- 角色名字 -->
@@ -18,6 +18,7 @@
                 class="input flex-grow-0"
                 messages="必填，最好不要超过三个中文"
                 placeholder="角色的名字"
+                v-model="name"
             />
 
             <!-- 角色头像 -->
@@ -83,6 +84,13 @@ export default {
         height: 100%;
         object-fit: contain;
         object-position: center;
+    }
+}
+
+.form {
+    > * {
+        width: 20em;
+        margin-top: 1.5em;
     }
 }
 </style>
