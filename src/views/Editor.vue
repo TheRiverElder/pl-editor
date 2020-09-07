@@ -130,7 +130,9 @@ export default {
             if (type === 'resource') {
                 id = 'resource';
             }
-            if (this.tabs.findIndex(t => t.id === id) >= 0) {
+            const index = this.tabs.findIndex(t => t.id === id);
+            if (index >= 0) {
+                this.tabIndex = index;
                 return;
             }
             let tab = null;
