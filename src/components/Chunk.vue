@@ -146,7 +146,7 @@
 <script>
 import { mapMutations, mapState } from "vuex";
 
-import Section from "./Section";
+import Section from "./Section.vue";
 
 export default {
     name: "Chunk",
@@ -212,6 +212,7 @@ export default {
 
         deleteLine(index) {
             this.sections.splice(index, 1);
+            this.$nextTick(() => this.focusOnSection(index - 1));
         },
 
         addExit() {
@@ -231,7 +232,10 @@ export default {
 
         focusOnSection(index) {
             index = Math.max(0, Math.min(index, this.sections.length - 1));
-            this.$refs.section[index].focus();
+            const list = this.$refs.section;
+            if (list.length && index < list.length) {
+                list[index].focus();
+            }
         },
     },
 };

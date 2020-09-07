@@ -1,54 +1,32 @@
 <template>
     <div
-        :class="'section mt-2 d-flex align-center' + (selected ? ' selected' : '')"
+        :class="'section d-flex align-start' + (selected ? ' selected' : '')"
         align="start"
         @mouseenter="showBtnBar = true"
         @mouseleave="showBtnBar = false"
         @click.shift.exact.stop="handleClick"
     >
-        <!-- 行号 -->
-        <span class="line-number text-subtitle-2 mr-3">{{ index + 1 }}</span>
-        
-        <span 
-            v-if="changingSpeaker"
-            class="speaker"
-        >
-            <v-select
-                class="ma-0"
-                dense
-                hide-details="auto"
-                height="1em"
-                :items="roleList"
-                item-text="name"
-                item-value="uid"
-                no-data-text="无可用角色"
-                v-model="section.speaker"
-                @blur="changingSpeaker = false"
-                @input="changingSpeaker = false"
-            />
+        <span class="mt-2 d-flex align-center">
+            <!-- 行号 -->
+            <span class="line-number text-subtitle-2 mr-3">{{ index + 1 }}</span>
+            
+            <span class="speaker">
+                <RoleSelector v-model="speaker"/>
+            </span>
+            
+            <span>:</span>
         </span>
-
-        <span 
-            v-else
-            class="speaker d-flex align-center"
-            @click.stop="changingSpeaker = true"
-        >
-            <RAvatar
-                size="2em"
-                contain
-                :src="speakerPicUrl"
-            />
-            <span>{{ speakerName }}</span>
-        </span>
-        
-        <span>:</span>
 
         <!-- 文本输入 -->
         <span class="mx-2 flex-grow-1">
-            <input
+            <v-textarea
+                rows="1"
+                auto-grow
+                dense
+                hide-details
                 ref="textInput"
                 class="text-input py-1"
-                v-model="section.text"
+                v-model="text"
                 @keyup="handleInputKey"
             />
         </span>
@@ -57,7 +35,7 @@
         <v-expand-x-transition>
             <v-btn-toggle 
                 v-if="showBtnBar"
-                class="btn-tgl"
+                class="btn-tgl mt-2"
                 dense
                 rounded
                 borderless
@@ -88,7 +66,7 @@
 <script>
 import state from '@/state.js'
 
-import RAvatar from '@/components/RAvatar.vue'
+import RoleSelector from './RoleSelector.vue'
 
 const project = state.project;
 
@@ -96,7 +74,7 @@ export default {
     name: 'Section',
 
     components: {
-        RAvatar
+        RoleSelector,
     },
 
     props: {
@@ -109,6 +87,8 @@ export default {
         return {
             changingSpeaker: false,
             showBtnBar: false,
+            speaker: null,
+            text: '',
         };
     },
 
@@ -166,6 +146,9 @@ export default {
 
         handleInputKey(event) {
             let doPreventDefault = true;
+            if (!event.ctrlKey) {
+                return;
+            }
             switch(event.key) {
                 case 'Enter': this.$emit('add-line', this.index + 1); break;
                 case 'ArrowUp': this.$emit('focus', this.index - 1); break;

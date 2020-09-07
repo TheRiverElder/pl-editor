@@ -5,14 +5,12 @@
         @blur="changingRole = false"
     >
         <v-select
-            class="ma-0"
             dense
-            hide-details="auto"
-            height="1em"
+            hide-details
             :items="roleList"
             v-model="roleUid"
             item-text="name"
-            item-value="uid"
+            item-value="id"
             no-data-text="无可用角色"
             @input="handleInput"
         />
@@ -33,11 +31,9 @@
 </template>
 
 <script>
-import state from '@/state.js'
 
 import RAvatar from '@/components/RAvatar.vue'
-
-const project = state.project;
+import { mapState } from 'vuex';
 
 export default {
     name: 'RoleSelector',
@@ -52,7 +48,6 @@ export default {
 
     data() {
         return {
-            roles: project.roles,
             changingRole: false,
             roleUid: this.value,
         };
@@ -65,23 +60,25 @@ export default {
     },
 
     computed: {
+        ...mapState(['roles', 'data', 'resources']),
+
         roleList() {
-            return project.roles.map(uid => ({uid, ...project.data[uid]}));
+            return this.roles.map(uid => this.data[uid]);
         },
 
         roleName() {
             if (this.roleUid) {
-                const role = project.data[this.roleUid];
+                const role = this.data[this.roleUid];
                 return role.name;
             }
-            return '未指定';
+            return '';
         },
 
         rolePicUrl() {
             if (this.roleUid) {
-                const role = project.data[this.roleUid];
+                const role = this.data[this.roleUid];
                 if (role) {
-                    const res = project.data[role.avatar || role.pic];
+                    const res = this.data[role.avatar || role.pic];
                     if (res) {
                         return res.src;
                     }
