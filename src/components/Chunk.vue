@@ -1,22 +1,7 @@
 <template>
-    <div class="chunk fill pa-5">
+    <div class="chunk fill px-5">
         <v-container class="pa-0 d-flex flex-column">
-
-            <div class="text-right ma-1" @mouseleave="openMenu = false">
-                <v-slide-x-reverse-transition>
-                    <span v-show="openMenu">
-                        <v-btn small text color="warning" @click="deleteSelf">
-                            <v-icon>mdi-delete</v-icon>删除
-                        </v-btn>
-                    </span>
-                </v-slide-x-reverse-transition>
-
-                <v-app-bar-nav-icon 
-                    @click="openMenu = !openMenu"
-                />
-            </div>
-
-            <div class="chunk-info px-15">
+            <div class="chunk-info pa-5">
                 <!-- 背景预览 -->
                 <img
                     class="background"
@@ -25,6 +10,20 @@
                     gradient="#ffffffaf 0%, #ffffffaf 50%, #fff 100%"
                     :src="backgroundUrl"
                 />
+
+                <div class="text-right ma-1" @mouseleave="openMenu = false">
+                    <v-slide-x-reverse-transition>
+                        <span v-show="openMenu">
+                            <v-btn small text color="warning" @click="deleteSelf">
+                                <v-icon>mdi-delete</v-icon>删除
+                            </v-btn>
+                        </span>
+                    </v-slide-x-reverse-transition>
+
+                    <v-app-bar-nav-icon 
+                        @click="openMenu = !openMenu"
+                    />
+                </div>
 
                 <!-- 输入标题 -->
                 <v-row align="baseline">
