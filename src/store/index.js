@@ -1,7 +1,22 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { cacheState, compile, downloadProject, downloadScript } from './transfer'
-import { createResource, createRole, createChunk, removeResource, removeRole, removeChunk, updateData } from './data-mutation'
+import { 
+    cacheState, 
+    compile, 
+    downloadProject, 
+    downloadScript,
+    loadProjectFromFile,
+    loadProjectFromCache,
+} from './transfer'
+import { 
+    createResource, 
+    createRole, 
+    createChunk, 
+    removeResource, 
+    removeRole, 
+    removeChunk, 
+    updateData, 
+} from './data-mutation'
 
 Vue.use(Vuex)
 
@@ -34,6 +49,8 @@ export default new Vuex.Store({
     compile,
     downloadProject,
     downloadScript,
+    loadProjectFromFile,
+    loadProjectFromCache,
 
 
     createResource,

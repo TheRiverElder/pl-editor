@@ -22,12 +22,64 @@
                         <v-list-item-title>下载脚本</v-list-item-title>
                     </v-list-item>
 
+                    <v-divider/>
+
                     <v-list-item dense @click="cacheState">
                         <v-list-item-title>缓存至浏览器</v-list-item-title>
                     </v-list-item>
 
-                    <v-list-item dense disabled>
-                        <v-list-item-title>读取浏览器缓存</v-list-item-title>
+                    <v-list-item dense @click="loadProjectFromCache">
+                        <v-list-item-title>从浏览器缓存载入工程</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item dense>
+                        <v-list-item-title class="p-relative">
+                            从文件载入工程
+                            <input class="invisible-overlay" type="file" @change="loadProjectFromFile($event.target.files[0])"/>
+                        </v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
+
+            
+            <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                        text
+                        height="32"
+                        tile
+                    >工程</v-btn>
+                </template>
+
+                <v-list>
+                    <v-list-item dense @click="compile">
+                        <v-list-item-title>编译为测试版</v-list-item-title>
+                    </v-list-item>
+                    
+                    <v-list-item dense @click="compile" disabled>
+                        <v-list-item-title>编译为发行版</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
+            
+            <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                        text
+                        height="32"
+                        tile
+                    >脚本</v-btn>
+                </template>
+
+                <v-list>
+                    <v-list-item dense @click="compile" :disabled="!script">
+                        <v-list-item-title>测试脚本（需要先编译）</v-list-item-title>
                     </v-list-item>
                 </v-list>
             </v-menu>
@@ -37,15 +89,27 @@
         <v-navigation-drawer app permanent clipped>
             <v-list>
                 <v-list-item @click="open('base-info')">
+                        <v-list-item-avatar>
+                            <v-icon>mdi-information-outline</v-icon>
+                        </v-list-item-avatar>
+
                     <v-list-item-title>基础信息</v-list-item-title>
                 </v-list-item>
 
                 <v-list-item @click="open('resource')">
+                        <v-list-item-avatar>
+                            <v-icon>mdi-folder-outline</v-icon>
+                        </v-list-item-avatar>
+                    
                     <v-list-item-title>资源管理器</v-list-item-title>
                 </v-list-item>
 
                 <v-list-group>
                     <template v-slot:activator>
+                        <v-list-item-avatar>
+                            <v-icon>mdi-account-outline</v-icon>
+                        </v-list-item-avatar>
+                        
                         <v-list-item-subtitle>角色</v-list-item-subtitle>
                     </template>
 
@@ -69,6 +133,10 @@
 
                 <v-list-group>
                     <template v-slot:activator>
+                        <v-list-item-avatar>
+                            <v-icon>mdi-text</v-icon>
+                        </v-list-item-avatar>
+
                         <v-list-item-subtitle>台词段</v-list-item-subtitle>
                     </template>
 
@@ -141,6 +209,13 @@ import Chunk from "./components/Chunk.vue";
 import BaseInfo from "./components/BaseInfo.vue";
 import { deepCopy } from "./utils/objects";
 
+const tabTypeIconMap = {
+    'resource': "mdi-folder-outline",
+    'role': "mdi-account-outline",
+    'chunk': "mdi-text",
+    'base-info': "mdi-information-outline",
+}
+
 export default {
     name: "App",
 
@@ -164,7 +239,7 @@ export default {
 
     methods: {
         ...mapMutations(['updateData', 'cacheState', 'createRole', 'createChunk',
-            'downloadProject', 'downloadScript', 'compile']),
+            'downloadProject', 'downloadScript', 'compile', 'loadProjectFromFile', 'loadProjectFromCache']),
 
         createNewRole() {
             this.createRole({cb: role => this.open('role', role.id)});
@@ -175,16 +250,7 @@ export default {
         },
 
         getIcon(type) {
-            switch (type) {
-                case "resource":
-                    return "mdi-file-outline";
-                case "role":
-                    return "mdi-account-outline";
-                case "chunk":
-                    return "mdi-text";
-                default:
-                    return "mdi-help";
-            }
+            return tabTypeIconMap[type] || 'mdi-help';
         },
 
         getComponent(type) {
@@ -270,6 +336,7 @@ export default {
                 this.$forceUpdate();
             }
         });
+        this.open('base-info');
     },
 };
 </script>
@@ -300,5 +367,19 @@ input[type="text"] {
     width: 100%;
     max-width: 64em;
     margin: 0 auto;
+}
+
+.p-relative {
+    position: relative;
+}
+
+.invisible-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    cursor: pointer;
 }
 </style>
