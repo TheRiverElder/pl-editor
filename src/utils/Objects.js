@@ -36,7 +36,18 @@ const Arrays = {
     }
 };
 
+function deepCopy(obj) {
+    if (Array.isArray(obj)) {
+        return obj.map(deepCopy);
+    } else if ('object' === typeof obj && obj !== null) {
+        return Object.entries(obj).reduce((p, [k, v]) => (p[k] = deepCopy(v), p), {});
+    } else {
+        return obj;
+    }
+}
+
 export {
     Objects,
     Arrays,
+    deepCopy,
 }

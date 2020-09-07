@@ -4,7 +4,7 @@
       app 
       color="primary"
     >
-      <v-tabs 
+      <!-- <v-tabs 
         class="flex-grow-0 flex-shrink-1 width-fit"
         style="width: fit-content"
         v-model="currentPageIndex" 
@@ -24,11 +24,12 @@
       >
         <v-icon class="mr-2">mdi-information-outline</v-icon>
         <span class="grey--text">{{ messages[messages.length - 1] }}</span>
-      </v-card>
+      </v-card> -->
     </v-app-bar>
 
     <v-main class="fill-y">
-      <router-view/>
+      <!-- <router-view/> -->
+      <Editor class="fill-y" />
     </v-main>
   </v-app>
 </template>
@@ -36,9 +37,14 @@
 <script>
 import state from '@/state.js';
 import { saveProject } from '@/utils/actions.js';
+import Editor from './views/Editor.vue';
 
 export default {
   name: 'App',
+
+  components: {
+    Editor,
+  },
 
   data: () => ({
     links: [
