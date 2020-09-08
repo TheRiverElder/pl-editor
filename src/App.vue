@@ -83,6 +83,25 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
+            
+            <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                        text
+                        height="32"
+                        tile
+                    >帮助</v-btn>
+                </template>
+
+                <v-list>
+                    <v-list-item dense @click="open('doc')">
+                        <v-list-item-title>帮助文档</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
         </v-app-bar>
 
         <!-- 侧边栏或者叫目录 -->
@@ -183,7 +202,7 @@
                     active-class=""
                 >
                     <v-tab-item 
-                        v-for="tab of tabs" 
+                        v-for="(tab, index) of tabs" 
                         :key="tab.id"
                         class="fill-y grey lighten-4"
                     >
@@ -192,6 +211,7 @@
                             :is="getComponent(tab.type)" 
                             :content="tab.content" 
                             @mutate="markDirty(tab)"
+                            @delete="close(index)"
                             ref="tabs"
                         />
                     </v-tab-item>
@@ -207,6 +227,7 @@ import ResourceManager from "./views/ResourceManager";
 import Role from "./components/Role.vue";
 import Chunk from "./components/Chunk.vue";
 import BaseInfo from "./components/BaseInfo.vue";
+import Doc from "./components/Doc.vue";
 import { deepCopy } from "./utils/objects";
 
 const tabTypeIconMap = {
@@ -214,7 +235,10 @@ const tabTypeIconMap = {
     'role': "mdi-account-outline",
     'chunk': "mdi-text",
     'base-info': "mdi-information-outline",
-}
+    'doc': "mdi-document",
+};
+
+const SPECIAL_TABS = new Set(['base-info', 'resource', 'doc']);
 
 export default {
     name: "App",
@@ -224,6 +248,7 @@ export default {
         Role,
         Chunk,
         BaseInfo,
+        Doc,
     },
 
     data() {
@@ -261,13 +286,15 @@ export default {
                     return "Role";
                 case "chunk":
                     return "Chunk";
+                case "doc":
+                    return "Doc";
                 default:
                     return "BaseInfo";
             }
         },
 
         open(type, id) {
-            if (type === "resource" || type === 'base-info') {
+            if (SPECIAL_TABS.has(type)) {
                 id = type;
             }
             const index = this.tabs.findIndex((t) => t.id === id);
@@ -276,13 +303,18 @@ export default {
                 return;
             }
             let tab = null;
-            if (type === "resource" || type === 'base-info') {
+            if (SPECIAL_TABS.has(type)) {
                 tab = {
-                    title: "资源管理器",
+                    title: null,
                     type,
                     id,
                     dirty: false,
                 };
+                switch (type) {
+                    case 'base-info': tab.title = '基础信息'; break;
+                    case 'resource': tab.title = '资源管理器'; break;
+                    case 'doc': tab.title = '帮助文档'; break;
+                }
             } else {
                 const data = deepCopy(this.data[id]);
                 tab = {

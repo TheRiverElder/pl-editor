@@ -159,7 +159,6 @@ export default {
 
     data() {
         return {
-            id: this.content.id,
             title: this.content.title,
             subtitle: this.content.subtitle,
             background: this.content.background,
@@ -178,6 +177,10 @@ export default {
 
     computed: {
         ...mapState(["data", "chunks"]),
+
+        id() {
+            return this.content.id;
+        },
 
         chunkList() {
             return this.chunks.map((uid) => this.data[uid]);
@@ -227,6 +230,7 @@ export default {
 
         deleteSelf() {
             this.removeChunk(this.id);
+            this.$emit('delete', this.id);
         },
 
         focusOnSection(index) {
@@ -234,12 +238,13 @@ export default {
             const list = this.$refs.section;
             if (list.length && index < list.length) {
                 list[index].focus();
+                this.$vuetify.scrollTo(list[index]);
             }
         },
 
         save() {
             this.updateData({
-                id: this.content.id,
+                id: this.id,
                 title: this.title,
                 subtitle: this.subtitle,
                 background: this.background,
