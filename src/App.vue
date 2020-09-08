@@ -14,6 +14,16 @@
                 </template>
 
                 <v-list>
+                    <v-list-item dense @click="saveTab(tabIndex)" :disabled="!tabs.length">
+                        <v-list-item-title>保存当前项目</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item dense @click="saveAllTabs" :disabled="!tabs.length">
+                        <v-list-item-title>保存所有项目</v-list-item-title>
+                    </v-list-item>
+
+                    <v-divider/>
+
                     <v-list-item dense @click="downloadProject">
                         <v-list-item-title>下载工程</v-list-item-title>
                     </v-list-item>
@@ -344,9 +354,16 @@ export default {
 
         saveTab(tab, index) {
             if (tab) {
-                this.$refs.tabs[index].save();
+                const el = this.$refs.tabs[index];
+                if (el) {
+                    el.save();
+                }
                 tab.dirty = false;
             }
+        },
+
+        saveAllTabs() {
+            this.tabs.forEach((t, i) => this.saveTab(t, i));
         },
 
         markDirty(tab) {
