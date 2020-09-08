@@ -32,11 +32,11 @@
                         <v-list-item-title>下载脚本</v-list-item-title>
                     </v-list-item>
 
-                    <v-divider/>
-
                     <v-list-item dense @click="cacheState">
                         <v-list-item-title>缓存至浏览器</v-list-item-title>
                     </v-list-item>
+
+                    <v-divider/>
 
                     <v-list-item dense @click="loadProjectFromCache">
                         <v-list-item-title>从浏览器缓存载入工程</v-list-item-title>
@@ -359,11 +359,13 @@ export default {
                     el.save();
                 }
                 tab.dirty = false;
+                this.cacheState();
             }
         },
 
         saveAllTabs() {
             this.tabs.forEach((t, i) => this.saveTab(t, i));
+            this.cacheState();
         },
 
         markDirty(tab) {
@@ -381,7 +383,6 @@ export default {
                 } else {
                     this.saveTab(this.tabs[this.tabIndex], this.tabIndex);
                 }
-                this.cacheState();
                 this.$forceUpdate();
             }
         });
