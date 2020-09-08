@@ -83,7 +83,7 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-btn block @click="addExit">新分支</v-btn>
+                        <v-btn block @click="addExit">新出口</v-btn>
                     </v-row>
                 </v-container>
             </div>
@@ -132,7 +132,7 @@
                 @click="addLine" 
                 elevation="0"
             >
-                <v-icon>mdi-plus</v-icon>新台词
+                <v-icon>mdi-plus</v-icon>新小节
             </v-btn>
         </v-row>
     </div>

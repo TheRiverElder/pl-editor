@@ -17,8 +17,9 @@
         </span>
 
         <!-- 文本输入 -->
-        <span class="mx-2 flex-grow-1">
+        <span class="text mx-2 flex-grow-1" @click="edit">
             <v-textarea
+                v-if="editText"
                 rows="1"
                 auto-grow
                 dense
@@ -27,13 +28,16 @@
                 class="text-input py-1"
                 v-model="text"
                 @keyup="handleInputKey"
+                @blur="editText = false"
             />
+
+            <p v-else class="pt-2">{{ text }}</p>
         </span>
 
         <!-- 增减工具 -->
         <v-expand-x-transition>
             <v-btn-toggle 
-                v-if="showBtnBar"
+                v-if="showBtnBar && !editText"
                 class="btn-tgl mt-2"
                 dense
                 rounded
@@ -87,6 +91,7 @@ export default {
             text: '',
             
             showBtnBar: false,
+            editText: false,
         };
     },
 
@@ -124,6 +129,11 @@ export default {
     methods: {
         focus() {
             this.$refs.textInput.focus();
+        },
+
+        edit() {
+            this.editText = true;
+            this.$nextTick(() => this.focus());
         },
 
         handleInputKey(event) {
@@ -187,5 +197,9 @@ export default {
 
 .selected {
     background-color: #0000000F;
+}
+
+.text {
+    min-height: 2.5em;
 }
 </style>
