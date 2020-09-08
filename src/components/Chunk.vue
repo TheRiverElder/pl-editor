@@ -82,8 +82,9 @@
                             <v-btn @click="deleteExit(index)">删除</v-btn>
                         </v-col>
                     </v-row>
+
                     <v-row>
-                        <v-btn block @click="addExit">新出口</v-btn>
+                        <v-btn text class="mx-auto" @click="addExit">新出口</v-btn>
                     </v-row>
                 </v-container>
             </div>

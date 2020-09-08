@@ -207,7 +207,7 @@
                 <v-divider />
 
                 <v-tabs-items 
-                    class="grey lighten-4 flex-grow-1" 
+                    class="fill-y inner-fill-y overflow-hidden inner-overflow-auto grey lighten-4 flex-grow-1" 
                     v-model="tabIndex"
                     active-class=""
                 >
@@ -431,5 +431,14 @@ input[type="text"] {
     right: 0;
     opacity: 0;
     cursor: pointer;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.overflow-auto,
+.inner-overflow-auto > * {
+    overflow: auto;
 }
 </style>

@@ -17,7 +17,7 @@
         </span>
 
         <!-- 文本输入 -->
-        <span class="text mx-2 flex-grow-1" @click="edit">
+        <span class="text mx-2 flex-grow-1" @click="focus">
             <v-textarea
                 v-if="editText"
                 rows="1"
@@ -128,12 +128,12 @@ export default {
 
     methods: {
         focus() {
-            this.$refs.textInput.focus();
-        },
-
-        edit() {
-            this.editText = true;
-            this.$nextTick(() => this.focus());
+            if (this.editText) {
+                this.$refs.textInput.focus()
+            } else {
+                this.editText = true;
+                this.$nextTick(() => this.$refs.textInput.focus());
+            }
         },
 
         handleInputKey(event) {
