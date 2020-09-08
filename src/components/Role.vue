@@ -26,6 +26,12 @@
 
             <!-- 角色的立绘 -->
             <ResSelector label="立绘" v-model="pic" />
+
+            <!-- 删除按钮 -->
+            <v-btn color="warning" @click="deleteSelf">
+                <v-icon>mdi-delete</v-icon>
+                删除该角色
+            </v-btn>
         </div>
 
         <!-- 立绘预览 -->
@@ -83,7 +89,12 @@ export default {
     },
 
     methods: {
-        ...mapMutations(['updateData']),
+        ...mapMutations(['updateData', 'removeRole']),
+
+        deleteSelf() {
+            this.removeRole(this.id);
+            this.$emit('delete', this.id);
+        },
 
         save() {
             this.updateData({
