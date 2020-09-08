@@ -9,7 +9,7 @@ import Demonstration from '@/views/Demonstration.vue'
 
 Vue.use(VueRouter)
 
-  const routes = [
+const routes = [
   {
     path: '/',
     name: 'Home',
