@@ -1,6 +1,6 @@
 <template>
     <!-- 角色展示 -->
-    <div class="pa-5 d-flex">
+    <div class="fill-y pa-5 d-flex">
         <div class="form d-flex flex-column align-center">
             <!-- 头像预览 -->
             <v-avatar 

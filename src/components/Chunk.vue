@@ -1,5 +1,5 @@
 <template>
-    <div class="chunk fill px-5">
+    <div class="chunk px-5">
         <v-container class="pa-0 d-flex flex-column">
             <div class="chunk-info pa-5">
                 <!-- 背景预览 -->
@@ -238,8 +238,8 @@ export default {
             index = Math.max(0, Math.min(index, this.sections.length - 1));
             const list = this.$refs.section;
             if (list.length && index < list.length) {
+                // this.$vuetify.goTo(list[index].$el);
                 list[index].focus();
-                this.$vuetify.scrollTo(list[index]);
             }
         },
 

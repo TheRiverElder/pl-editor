@@ -217,7 +217,7 @@
                         class="fill-y grey lighten-4"
                     >
                         <component 
-                            class="fill-y edit-area"
+                            class="edit-area"
                             :is="getComponent(tab.type)" 
                             :content="tab.content" 
                             @mutate="markDirty(tab)"
