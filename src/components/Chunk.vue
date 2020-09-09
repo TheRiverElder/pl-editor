@@ -1,5 +1,5 @@
 <template>
-    <div class="chunk max-width-64em px-5" v-scroll:self>
+    <div class="chunk max-width-64em px-5">
         <v-container class="pa-0 d-flex flex-column">
             <div class="chunk-info px-5 pt-5 pb-0">
                 <!-- 背景预览 -->

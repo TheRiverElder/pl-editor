@@ -18,7 +18,7 @@
 
         <div class="content fill pa-3 d-flex flex-column justify-end">
             <div class="text oculus mb-3 pa-2">
-                {{ speakerName }}：{{ text }}
+                {{ speakerName }}：{{ line }}
             </div>
 
             <ul class="options oculus pa-2">
@@ -122,7 +122,7 @@ export default {
                     this.bgm = this.script.resources[instruction[1]];
                     break;
                 case 'line': {
-                    this.text = instruction[1];
+                    this.line = instruction[1];
                     const role = this.script.roles[instruction[2]];
                     this.speakerPic = this.script.resources[role.pic];
                     this.speakerName = role.name;
