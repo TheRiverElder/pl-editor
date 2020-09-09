@@ -17,11 +17,14 @@ import {
     removeChunk, 
     updateData, 
 } from './data-mutation'
+import { v4 as genId } from 'uuid';
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+
+    id: genId(),
 
     name: '未命名', // 剧本的名称
     
