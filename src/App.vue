@@ -136,7 +136,9 @@
                 </v-list>
             </v-menu>
 
-            <span class="white--text pl-5 ml-5">v2.3</span>
+            <v-spacer/>
+
+            <v-subheader class="white--text">v2.4</v-subheader>
         </v-app-bar>
 
         <!-- 侧边栏或者叫目录 -->

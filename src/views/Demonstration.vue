@@ -274,7 +274,7 @@ export default {
 
 .debug-panel {
     z-index: 100;
-    opacity: 50%;
+    opacity: .5;
 }
 
 </style>
