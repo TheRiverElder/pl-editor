@@ -16,6 +16,38 @@
             :src="speakerPic"
         />
 
+        <v-toolbar 
+            class="debuger absolute"
+            :collapse="openDebuger"
+            extension-height="200"
+        >
+            <v-app-bar-nav-icon @click="openDebuger = !openDebuger"/>
+
+            <v-toolbar-title>调试工具</v-toolbar-title>
+
+            <template class="d-flex align-start" v-slot:extension>
+                <div class="align-self-start d-flex align-center">
+                    <label>指令指针：</label>
+
+                    <input
+                        type="number"
+                        :min="0"
+                        :max="script.instructions.length - 1"
+                        v-model.number="pointer"
+                    />
+
+                    <v-btn text small @click="forceRun">执行</v-btn>
+                </div>
+
+                <ul class="align-self-start fill-y overflow-auto flex-grow-1">
+                    <li
+                        v-for="(log, index) of logger"
+                        :key="index"
+                    >{{ log }}</li>
+                </ul>
+            </template>
+        </v-toolbar>
+
         <div class="content fill pa-3 d-flex flex-column justify-end">
             <div class="text oculus mb-3 pa-2">
                 {{ speakerName }}：{{ line }}
@@ -26,10 +58,8 @@
                     class="option pa-2"
                     v-for="(option, index) of options"
                     :key="index"
-                    @click="handleClickOption"
-                >
-                   {{ option.text }}
-                </li> 
+                    @click="handleClickOption(index)"
+                >{{ option.text }}</li> 
 
                 <li 
                     v-if="!options.length" 
@@ -38,30 +68,6 @@
                 >...</li>
             </ul>
 
-        </div>
-
-        <div class="debug-panel absolute pa-3">
-            <div class="d-flex justify-center">
-                <v-input
-                    label="指针："
-                >
-                    <input
-                        type="number"
-                        :min="0"
-                        :max="script.instructions.length - 1"
-                        v-model.number="pointer"
-                    />
-                </v-input>
-
-                <v-btn @click="forceRun">执行</v-btn>
-            </div>
-
-            <ul>
-                <li
-                    v-for="(log, index) of logger"
-                    :key="index"
-                >{{ log }}</li>
-            </ul>
         </div>
     </div>
 </template>
@@ -84,6 +90,7 @@ export default {
             
             hasSetText: false,
             logger: [],
+            openDebuger: false,
         };
     },
 
@@ -113,28 +120,33 @@ export default {
         },
 
         apply(instruction) {
-            this.log(instruction.join(' '));
+            const script = this.script;
             switch (instruction[0]) {
-                case 'bg': 
-                    this.background = this.script.resources[instruction[1]];
-                    break;
+                case 'bg': {
+                    const resIndex = instruction[1];
+                    this.background = script.resources[resIndex];
+                    this.log('设置背景', script.map ? script.map.resourceNames[resIndex] : this.background.slice(-32));
+                } break;
                 case 'bgm': 
-                    this.bgm = this.script.resources[instruction[1]];
+                    this.bgm = script.resources[instruction[1]];
                     break;
                 case 'line': {
                     this.line = instruction[1];
-                    const role = this.script.roles[instruction[2]];
-                    this.speakerPic = this.script.resources[role.pic];
+                    const role = script.roles[instruction[2]];
+                    this.speakerPic = script.resources[role.pic];
                     this.speakerName = role.name;
                     this.options = [];
                     this.hasSetText = true;
+                    this.log('说台词', this.speakerName, this.line);
                 } break;
-                case 'option': 
-                    this.options.push({
+                case 'option': {
+                    const option = {
                         text: instruction[1],
                         target: instruction[2],
-                    });
-                    break;
+                    };
+                    this.options.push(option);
+                    this.log('添加选项', option.text, script.map ? script.map.chunkTitles[option.target] : option.target);
+                } break;
             }
         },
 
@@ -163,11 +175,11 @@ export default {
             this.run();
         },
 
-        log(msg) {
+        log(...msgs) {
             if (this.logger.length >= 10) {
                 this.logger.shift();
             }
-            this.logger.push(msg);
+            this.logger.push(`[${msgs[0]}] ` + msgs.slice(1).join(' '));
         },
     },
 
@@ -190,6 +202,9 @@ export default {
 
 .absolute {
     position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
 .background {
@@ -240,12 +255,9 @@ export default {
     background-color: #FFFFFF;
 }
 
-.debug-panel {
-    top: 0;
-    z-index: 10;
-    width: 100%;
-    max-height: 50%;
-    background-color: #FFFFFF80;
+.debuger {
+    z-index: 100;
+    opacity: 50%;
 }
 
 </style>

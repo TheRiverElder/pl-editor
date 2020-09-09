@@ -3,8 +3,13 @@ import download from 'downloadjs'
 const LS_KEY = 'pl-editor-project';
 
 // 编译剧本
-function compile(state) {
+function compile(state, env = 'development') {
+    const doMapping = env === 'development';
     const mapping = {};
+    const map = doMapping ? {
+        resourceNames: state.resources.map(uid => state.data[uid].name),
+        chunkTitles: {},
+    } : null;
 
     const resources = state.resources.map(uid => state.data[uid].src);
     state.resources.forEach((uid, index) => mapping[uid] = index);
@@ -24,6 +29,9 @@ function compile(state) {
     state.chunks.forEach(uid => {
         const chunk = state.data[uid];
         mapping[uid] = instructions.length;
+        if (doMapping) {
+            map.chunkTitles[instructions.length] = chunk.title;
+        }
         instructions.push(
             ['bg', mapping[chunk.background]],
             // ['bgm', mapping[chunk.bgm]],
@@ -33,12 +41,12 @@ function compile(state) {
                     .filter(l => !/^\s*$/.test(l))
                     .map(l => ['line', l, mapping[s.speaker]])), p), 
                 []),
-            ...chunk.exits.map(e => ['exit', e.text, mapping[e.target]]),
+            ...chunk.exits.map(e => ['option', e.text, e.target]),
         );
     });
 
     instructions.forEach(ins => {
-        if (ins[0] === 'exit') {
+        if (ins[0] === 'option') {
             ins[2] = mapping[ins[2]];
         }
     });
@@ -51,6 +59,10 @@ function compile(state) {
         resources,
         roles,
     };
+
+    if (doMapping) {
+        script.map = map;
+    }
 
     state.script = script;
 }

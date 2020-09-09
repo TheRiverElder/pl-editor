@@ -65,11 +65,11 @@
                 </template>
 
                 <v-list>
-                    <v-list-item dense @click="compile">
+                    <v-list-item dense @click="compile('development')">
                         <v-list-item-title>编译为测试版</v-list-item-title>
                     </v-list-item>
                     
-                    <v-list-item dense @click="compile" disabled>
+                    <v-list-item dense @click="compile('production')" disabled>
                         <v-list-item-title>编译为发行版</v-list-item-title>
                     </v-list-item>
                 </v-list>

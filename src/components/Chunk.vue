@@ -71,7 +71,7 @@
                                     v-model="exit.target"
                                     :items="chunkList"
                                     item-text="title"
-                                    item-value="uid"
+                                    item-value="id"
                                 />
                             </v-col>
 
