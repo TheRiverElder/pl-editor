@@ -135,12 +135,14 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
+
+            <span class="white--text pl-5 ml-5">v2.3</span>
         </v-app-bar>
 
         <!-- 侧边栏或者叫目录 -->
         <v-navigation-drawer app permanent clipped v-if="showNav">
             <v-list>
-                <v-list-item @click="open('base-info')">
+                <v-list-item @click="open('base-info', id)">
                         <v-list-item-avatar>
                             <v-icon>mdi-information-outline</v-icon>
                         </v-list-item-avatar>
@@ -148,7 +150,7 @@
                     <v-list-item-title>基础信息</v-list-item-title>
                 </v-list-item>
 
-                <v-list-item @click="open('res-manager')">
+                <v-list-item @click="open('res-manager', id)">
                         <v-list-item-avatar>
                             <v-icon>mdi-folder-outline</v-icon>
                         </v-list-item-avatar>
@@ -264,20 +266,20 @@ import Doc from "./components/Doc.vue";
 import Demonstration from './views/Demonstration.vue';
 
 const TAB_TYPES = {
-    "base-info"() {
+    "base-info"(id) {
         return {
             type: "base-info",
-            id: "base-info",
+            id,
             icon: 'mdi-information-outline',
             title: '基础信息',
             component: 'BaseInfo',
             dirty: false,
         };
     },
-    "res-manager"() {
+    "res-manager"(id) {
         return {
             type: "res-manager",
-            id: "res-manager",
+            id,
             icon: 'mdi-folder-outline',
             title: '资源管理器',
             component: 'ResourceManager',
@@ -348,7 +350,14 @@ export default {
     },
 
     computed: {
-        ...mapState(["resources", "roles", "chunks", "data", 'script']),
+        ...mapState(['id', "resources", "roles", "chunks", "data", 'script']),
+    },
+
+    watch: {
+        id(val) {
+            this.closeAll();
+            this.open('base-info', val);
+        }
     },
 
     methods: {
@@ -427,7 +436,7 @@ export default {
                 this.$forceUpdate();
             }
         });
-        this.open('base-info');
+        this.open('base-info', this.id);
     },
 };
 </script>

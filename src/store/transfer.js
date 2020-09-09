@@ -1,4 +1,5 @@
 import download from 'downloadjs'
+import { v4 as genId } from 'uuid'
 
 const LS_KEY = 'pl-editor-project';
 
@@ -90,7 +91,7 @@ function downloadProject(state) {
 function loadProjectFromCache(state) {
     const json = localStorage.getItem(LS_KEY);
     if (json) {
-        Object.assign(state, JSON.parse(json));
+        overriteState(state, JSON.parse(json));
     }
 }
 
@@ -98,7 +99,7 @@ function loadProjectFromCache(state) {
 function loadProjectFromFile(state, file) {
     const reader = new FileReader();
     reader.onload = () => {
-        Object.assign(state, JSON.parse(reader.result));
+        overriteState(state, JSON.parse(reader.result));
     }
     reader.readAsText(file);
 }
@@ -109,6 +110,20 @@ function downloadScript(state) {
     if (script) {
         download(JSON.stringify(script), (script.name || '未命名') + '.egg.json', 'application/json');
     }
+}
+
+function overriteState(state, obj) {
+    Object.assign(state, {
+        id: genId(),
+        name: '未命名',
+        version: '1.0.0',
+        authors: [],
+        data: {},
+        resources: [],
+        roles: [],
+        chunks: [],
+        script: null,
+    }, obj);
 }
 
 export {

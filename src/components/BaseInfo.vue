@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex';
+import { mapMutations } from 'vuex';
 import { mutateWatcher } from '../utils/vue-util.js'
 
 export default {
@@ -35,16 +35,8 @@ export default {
         };
     },
 
-    computed: {
-        ...mapState(['id']),
-    },
-
     watch: {
         ...mutateWatcher(null, 'name', 'version', 'authors'),
-
-        id() {
-            this.update();
-        },
     },
 
     methods: {
