@@ -1,7 +1,7 @@
 <template>
-    <div class="chunk max-width-64em px-5">
+    <div class="chunk max-width-64em px-5" v-scroll:self>
         <v-container class="pa-0 d-flex flex-column">
-            <div class="chunk-info pa-5">
+            <div class="chunk-info px-5 pt-5 pb-0">
                 <!-- 背景预览 -->
                 <img
                     class="background"
@@ -20,21 +20,14 @@
                         </span>
                     </v-slide-x-reverse-transition>
 
-                    <v-app-bar-nav-icon 
-                        @click="openMenu = !openMenu"
-                    />
+                    <v-app-bar-nav-icon @click="openMenu = !openMenu" />
                 </div>
 
                 <!-- 输入标题 -->
                 <v-row align="baseline">
                     <v-col cols="2">标题</v-col>
                     <v-col cols="10">
-                        <input
-                            class="text-h4"
-                            type="text"
-                            v-model="title"
-                            placeholder="此处输入标题"
-                        />
+                        <input class="text-h4" type="text" v-model="title" placeholder="此处输入标题" />
                     </v-col>
                 </v-row>
 
@@ -55,38 +48,47 @@
                 <v-row align="baseline">
                     <v-col cols="2">背景</v-col>
                     <v-col cols="10">
-                        <ResSelector 
-                            placeholder="选择背景"
-                            v-model="background"
-                        />
+                        <ResSelector placeholder="选择背景" v-model="background" />
                     </v-col>
                 </v-row>
 
-                <v-container>
-                    <v-row v-for="(exit, index) of exits" :key="index">
-                        <v-col cols="1">{{ index + 1 }}</v-col>
-                        <v-col cols="8">
-                            <input v-model="exit.text" />
-                        </v-col>
-                        <v-col cols="2">
-                            <v-select
-                                dense
-                                hide-details
-                                v-model="exit.target"
-                                :items="chunkList"
-                                item-text="title"
-                                item-value="uid"
-                            />
-                        </v-col>
-                        <v-col cols="1">
-                            <v-btn @click="deleteExit(index)">删除</v-btn>
-                        </v-col>
-                    </v-row>
+                <v-expand-transition>
+                    <v-container v-if="openExits" class="py-0">
+                        <v-subheader>出口列表</v-subheader>
 
-                    <v-row>
-                        <v-btn text class="mx-auto" @click="addExit">新出口</v-btn>
-                    </v-row>
-                </v-container>
+                        <v-row v-for="(exit, index) of exits" :key="index">
+                            <v-col cols="1">{{ index + 1 }}</v-col>
+
+                            <v-col cols="8">
+                                <v-text-field label="选项文本" dense hide-details v-model="exit.text" />
+                            </v-col>
+
+                            <v-col cols="2">
+                                <v-select
+                                    label="目标"
+                                    dense
+                                    hide-details
+                                    v-model="exit.target"
+                                    :items="chunkList"
+                                    item-text="title"
+                                    item-value="uid"
+                                />
+                            </v-col>
+
+                            <v-col cols="1">
+                                <v-btn small color="warning" text @click="deleteExit(index)">删除</v-btn>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-btn text class="mx-auto" @click="addExit">新出口</v-btn>
+                        </v-row>
+                    </v-container>
+                </v-expand-transition>
+
+                <v-btn text bottom block @click="openExits = !openExits">
+                    <v-icon>{{ openExits ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+                </v-btn>
             </div>
         </v-container>
 
@@ -123,16 +125,10 @@
                     @focus="focusOnSection"
                 />
             </template>
-            </v-virtual-scroll>-->
+        </v-virtual-scroll>-->
 
         <v-row class="flex-grow-0 pa-2">
-            <v-btn 
-                class="mx-auto"
-                ref="btnAdd" 
-                color="primary" 
-                @click="addLine" 
-                elevation="0"
-            >
+            <v-btn class="mx-auto" ref="btnAdd" color="primary" @click="addLine" elevation="0">
                 <v-icon>mdi-plus</v-icon>新小节
             </v-btn>
         </v-row>
@@ -141,8 +137,8 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
-import { mutateWatcher } from '../utils/vue-util'
-import ResSelector from './ResSelector'
+import { mutateWatcher } from "../utils/vue-util";
+import ResSelector from "./ResSelector";
 
 import Section from "./Section.vue";
 
@@ -151,7 +147,7 @@ export default {
 
     components: {
         Section,
-        ResSelector
+        ResSelector,
     },
 
     props: {
@@ -169,12 +165,12 @@ export default {
             exits: chunk.exits,
 
             openMenu: false,
+            openExits: false,
         };
     },
-    
 
     watch: {
-        ...mutateWatcher(null, 'title', 'subtitle', 'background'),
+        ...mutateWatcher(null, "title", "subtitle", "background"),
     },
 
     computed: {
@@ -194,22 +190,26 @@ export default {
     },
 
     methods: {
-        ...mapMutations(["removeChunk", 'updateData']),
+        ...mapMutations(["removeChunk", "updateData"]),
 
         addLine(index) {
-            if ("number" !== typeof index || index < 0 || index > this.sections.length) {
+            if (
+                "number" !== typeof index ||
+                index < 0 ||
+                index > this.sections.length
+            ) {
                 index = this.sections.length;
             }
             const speaker = index ? this.sections[index - 1].speaker : null;
             const section = { speaker, text: "" };
             this.sections.splice(index, 0, section);
-            this.$emit('mutate');
+            this.$emit("mutate");
             this.$nextTick(() => this.focusOnSection(index));
         },
 
         deleteLine(index) {
             this.sections.splice(index, 1);
-            this.$emit('mutate');
+            this.$emit("mutate");
             this.$nextTick(() => this.focusOnSection(index - 1));
         },
 
@@ -218,17 +218,17 @@ export default {
                 text: "",
                 target: null,
             });
-            this.$emit('mutate');
+            this.$emit("mutate");
         },
 
         deleteExit(index) {
             this.exits.splice(index, 1);
-            this.$emit('mutate');
+            this.$emit("mutate");
         },
 
         deleteSelf() {
             this.removeChunk(this.id);
-            this.$emit('delete', this.id);
+            this.$emit("delete", this.id);
         },
 
         focusOnSection(index) {

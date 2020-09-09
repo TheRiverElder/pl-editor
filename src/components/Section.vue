@@ -31,7 +31,12 @@
                 @blur="editText = false"
             />
 
-            <p v-else class="pt-2">{{ text }}</p>
+            <p 
+                v-else 
+                class="pt-2 mb-0"
+                v-for="(line, index) of lines"
+                :key="index"
+            >{{ line }}</p>
         </span>
 
         <!-- 增减工具 -->
@@ -101,6 +106,10 @@ export default {
 
     computed: {
         ...mapState(['data']),
+
+        lines() {
+            return this.text.split('\n').filter(l => !/^\s*$/.test(l)).map(l => l.trim());
+        },
 
         speakerName() {
             if (this.speaker) {
