@@ -144,7 +144,7 @@
         <!-- 侧边栏或者叫目录 -->
         <v-navigation-drawer app permanent clipped v-if="showNav">
             <v-list>
-                <v-list-item @click="open('base-info', id)">
+                <v-list-item @click="open('base-info', 'base-info' + id)">
                         <v-list-item-avatar>
                             <v-icon>mdi-information-outline</v-icon>
                         </v-list-item-avatar>
@@ -152,7 +152,7 @@
                     <v-list-item-title>基础信息</v-list-item-title>
                 </v-list-item>
 
-                <v-list-item @click="open('res-manager', id)">
+                <v-list-item @click="open('res-manager', 'res-manager' + id)">
                         <v-list-item-avatar>
                             <v-icon>mdi-folder-outline</v-icon>
                         </v-list-item-avatar>
