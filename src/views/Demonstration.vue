@@ -39,7 +39,7 @@
                     <v-btn text small @click="forceRun">执行</v-btn>
                 </div>
 
-                <ul class="align-self-start fill-y overflow-auto flex-grow-1">
+                <ul class="align-self-start fill-y overflow-auto flex-grow-1" ref="logger">
                     <li
                         v-for="(log, index) of logger"
                         :key="index"
@@ -49,13 +49,13 @@
         </v-toolbar>
 
         <div class="content fill pa-3 d-flex flex-column justify-end">
-            <div class="text oculus mb-3 pa-2">
+            <div class="text round oculus mb-3 pa-2">
                 {{ speakerName }}：{{ line }}
             </div>
 
-            <ul class="options oculus pa-2">
+            <ul class="options round oculus pa-2">
                 <li 
-                    class="option pa-2"
+                    class="option py-2 px-5"
                     v-for="(option, index) of options"
                     :key="index"
                     @click="handleClickOption(index)"
@@ -63,7 +63,7 @@
 
                 <li 
                     v-if="!options.length" 
-                    class="option"
+                    class="option py-2 px-5"
                     @click="handleClickDefaultOption"
                 >...</li>
             </ul>
@@ -161,11 +161,13 @@ export default {
 
         jumpTo(target) {
             this.pointer = target;
+            this.log('转跳到', this.pointer, this.script.map ? this.script.map.chunkTitles[this.pointer] : '');
         },
 
         handleClickOption(optIndex) {
             this.hasSetText = false;
             const option = this.options[optIndex];
+            this.log('玩家选择', option.text, this.script.map ? this.script.map.chunkTitles[option.target] : option.target);
             this.jumpTo(option.target);
             this.run();
         },
@@ -176,10 +178,21 @@ export default {
         },
 
         log(...msgs) {
-            if (this.logger.length >= 10) {
-                this.logger.shift();
-            }
-            this.logger.push(`[${msgs[0]}] ` + msgs.slice(1).join(' '));
+            // if (this.logger.length >= 10) {
+            //     this.logger.shift();
+            // }
+            const time = new Date();
+            this.logger.push(`${time.toLocaleString()} [${msgs[0]}] ` + msgs.slice(1).join(' '));
+            this.$nextTick(() => {
+                const el = this.$refs.logger;
+                if (el) {
+                    el.scrollTo({
+                        left: 0, 
+                        top: el.scrollHeight, 
+                        behavior: 'smooth'
+                    });
+                }
+            });
         },
     },
 
@@ -240,8 +253,12 @@ export default {
     overflow-y: auto;
 }
 
+.round {
+    border-radius: .2em;
+}
+
 .options {
-    height: 35%;
+    height: 25%;
     overflow-x: hidden;
     overflow-y: auto;
 }
