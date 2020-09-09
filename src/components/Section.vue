@@ -92,8 +92,8 @@ export default {
 
     data() {
         return {
-            speaker: null,
-            text: '',
+            speaker: this.section.speaker,
+            text: this.section.text,
             
             showBtnBar: false,
             editText: false,
