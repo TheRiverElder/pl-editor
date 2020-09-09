@@ -76,7 +76,7 @@ export default {
         return {
             pointer: 0,
             background: null,
-            // bgm: null,
+            bgm: null,
             speakerName: '',
             speakerPic: null,
             line: '',
@@ -92,7 +92,7 @@ export default {
             if (nv !== ov && 'string' === typeof nv && nv.length > 0) {
                 this.$refs.bgm.play();
             }
-        }
+        },
     },
 
     computed: {

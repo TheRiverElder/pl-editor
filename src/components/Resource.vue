@@ -53,8 +53,8 @@ export default {
     watch: {
         name(newVal, oldVal) {
             this.errors = newVal.length === 0 ? "名字不可为空" : null;
-            if (newVal !== oldVal) {
-                this.$emit('mutate');
+            if (newVal !== oldVal && newVal) {
+                this.updateData({ id: this.id, name: newVal })
             }
         },
 

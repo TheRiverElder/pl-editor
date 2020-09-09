@@ -88,7 +88,7 @@
                 </template>
 
                 <v-list>
-                    <v-list-item dense @click="open('test-player')" :disabled="!script">
+                    <v-list-item dense @click="open('demo')" :disabled="!script">
                         <v-list-item-title>开始测试</v-list-item-title>
                     </v-list-item>
                 </v-list>
@@ -335,6 +335,7 @@ export default {
         Chunk,
         BaseInfo,
         Doc,
+        Demonstration,
     },
 
     data() {

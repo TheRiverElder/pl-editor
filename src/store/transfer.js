@@ -21,13 +21,13 @@ function compile(state) {
 
 
     const instructions = [];
-    state.chunks.map(uid => {
+    state.chunks.forEach(uid => {
         const chunk = state.data[uid];
         mapping[uid] = instructions.length;
         instructions.push(
             ['bg', mapping[chunk.background]],
-            ['bgm', mapping[chunk.bgm]],
-            ...chunk.sections.map(s => ['line', s.text, mapping[s.speaker]]),
+            // ['bgm', mapping[chunk.bgm]],
+            ...chunk.sections.reduce((p, s) => (p.push(...s.text.split('\n').filter(l => !/\s*/.test(l)).map(l => ['line', l, mapping[s.speaker]])), p), []),
             ...chunk.exits.map(e => ['exit', e.text, mapping[e.target]]),
         );
     });
