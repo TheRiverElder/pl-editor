@@ -1,5 +1,5 @@
 <template>
-    <div class="chunk px-5">
+    <div class="chunk max-width-64em px-5">
         <v-container class="pa-0 d-flex flex-column">
             <div class="chunk-info pa-5">
                 <!-- 背景预览 -->
@@ -155,17 +155,18 @@ export default {
     },
 
     props: {
-        content: Object,
+        id: String,
     },
 
     data() {
+        const chunk = this.$store.state.data[this.id];
         return {
-            title: this.content.title,
-            subtitle: this.content.subtitle,
-            background: this.content.background,
+            title: chunk.title,
+            subtitle: chunk.subtitle,
+            background: chunk.background,
             // bgm: null,
-            sections: this.content.sections,
-            exits: this.content.exits,
+            sections: chunk.sections,
+            exits: chunk.exits,
 
             openMenu: false,
         };
@@ -173,15 +174,11 @@ export default {
     
 
     watch: {
-        ...mutateWatcher('content', 'title', 'subtitle', 'background'),
+        ...mutateWatcher(null, 'title', 'subtitle', 'background'),
     },
 
     computed: {
         ...mapState(["data", "chunks"]),
-
-        id() {
-            return this.content.id;
-        },
 
         chunkList() {
             return this.chunks.map((uid) => this.data[uid]);

@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import state from '@/state.js'
+import { mapState } from 'vuex';
 
 export default {
     name: 'Demonstration',
@@ -76,11 +76,12 @@ export default {
         return {
             pointer: 0,
             background: null,
-            bgm: null,
-            speakerPic: null,
+            // bgm: null,
             speakerName: '',
+            speakerPic: null,
             line: '',
             options: [],
+            
             hasSetText: false,
             logger: [],
         };
@@ -95,7 +96,7 @@ export default {
     },
 
     computed: {
-        script: () => state.script,
+        ...mapState(['script']),
     },
 
     methods: {

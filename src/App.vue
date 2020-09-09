@@ -88,8 +88,31 @@
                 </template>
 
                 <v-list>
-                    <v-list-item dense @click="compile" :disabled="!script">
-                        <v-list-item-title>测试脚本（需要先编译）</v-list-item-title>
+                    <v-list-item dense @click="open('test-player')" :disabled="!script">
+                        <v-list-item-title>开始测试</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
+            
+            <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                        text
+                        height="32"
+                        tile
+                    >窗口</v-btn>
+                </template>
+
+                <v-list>
+                    <v-list-item dense @click="showNav = !showNav">
+                        <v-list-item-title>开关导航栏</v-list-item-title>
+                    </v-list-item>
+                    
+                    <v-list-item dense @click="closeAll">
+                        <v-list-item-title>关闭所有标签</v-list-item-title>
                     </v-list-item>
                 </v-list>
             </v-menu>
@@ -115,7 +138,7 @@
         </v-app-bar>
 
         <!-- 侧边栏或者叫目录 -->
-        <v-navigation-drawer app permanent clipped>
+        <v-navigation-drawer app permanent clipped v-if="showNav">
             <v-list>
                 <v-list-item @click="open('base-info')">
                         <v-list-item-avatar>
@@ -125,7 +148,7 @@
                     <v-list-item-title>基础信息</v-list-item-title>
                 </v-list-item>
 
-                <v-list-item @click="open('resource')">
+                <v-list-item @click="open('res-manager')">
                         <v-list-item-avatar>
                             <v-icon>mdi-folder-outline</v-icon>
                         </v-list-item-avatar>
@@ -194,7 +217,7 @@
                         :key="tab.id" 
                         size="small"
                     >
-                        <v-icon small>{{ getIcon(tab.type) }}</v-icon>
+                        <v-icon small>{{ tab.icon }}</v-icon>
 
                         <span class="mx-1">{{ tab.title }}</span>
 
@@ -218,8 +241,8 @@
                     >
                         <component 
                             class="edit-area"
-                            :is="getComponent(tab.type)" 
-                            :content="tab.content" 
+                            :is="tab.component" 
+                            :id="tab.id" 
                             @mutate="markDirty(tab)"
                             @delete="close(index)"
                             ref="tabs"
@@ -238,17 +261,70 @@ import Role from "./components/Role.vue";
 import Chunk from "./components/Chunk.vue";
 import BaseInfo from "./components/BaseInfo.vue";
 import Doc from "./components/Doc.vue";
-import { deepCopy } from "./utils/objects";
+import Demonstration from './views/Demonstration.vue';
 
-const tabTypeIconMap = {
-    'resource': "mdi-folder-outline",
-    'role': "mdi-account-outline",
-    'chunk': "mdi-text",
-    'base-info': "mdi-information-outline",
-    'doc': "mdi-document",
+const TAB_TYPES = {
+    "base-info"() {
+        return {
+            type: "base-info",
+            id: "base-info",
+            icon: 'mdi-information-outline',
+            title: '基础信息',
+            component: 'BaseInfo',
+            dirty: false,
+        };
+    },
+    "res-manager"() {
+        return {
+            type: "res-manager",
+            id: "res-manager",
+            icon: 'mdi-folder-outline',
+            title: '资源管理器',
+            component: 'ResourceManager',
+            dirty: false,
+        };
+    },
+    "doc"() {
+        return {
+            type: "doc",
+            id: "doc",
+            icon: 'mdi-document',
+            title: '帮助文档',
+            component: 'Doc',
+            dirty: false,
+        };
+    },
+    "demo"() {
+        return {
+            type: "demo",
+            id: "demo",
+            icon: 'mdi-play',
+            title: '演示',
+            component: 'Demonstration',
+            dirty: false,
+        };
+    },
+    "role"(id, data) {
+        return {
+            type: "role",
+            id: id,
+            icon: 'mdi-account-outline',
+            title: data[id] ? data[id].name : '未知角色',
+            component: 'Role',
+            dirty: false,
+        };
+    },
+    "chunk"(id, data) {
+        return {
+            type: "chunk",
+            id: id,
+            icon: 'mdi-text',
+            title: data[id] ? data[id].title : '未知文本段',
+            component: 'Chunk',
+            dirty: false,
+        };
+    },
 };
-
-const SPECIAL_TABS = new Set(['base-info', 'resource', 'doc']);
 
 export default {
     name: "App",
@@ -265,6 +341,8 @@ export default {
         return {
             tabIndex: null,
             tabs: [],
+            showNav: true,
+            Demonstration,
         };
     },
 
@@ -284,63 +362,17 @@ export default {
             this.createChunk({cb: role => this.open('chunk', role.id)});
         },
 
-        getIcon(type) {
-            return tabTypeIconMap[type] || 'mdi-help';
-        },
-
-        getComponent(type) {
-            switch (type) {
-                case "resource":
-                    return "ResourceManager";
-                case "role":
-                    return "Role";
-                case "chunk":
-                    return "Chunk";
-                case "doc":
-                    return "Doc";
-                default:
-                    return "BaseInfo";
-            }
-        },
-
         open(type, id) {
-            if (SPECIAL_TABS.has(type)) {
-                id = type;
-            }
-            const index = this.tabs.findIndex((t) => t.id === id);
-            if (index >= 0) {
-                this.tabIndex = index;
-                return;
-            }
-            let tab = null;
-            if (SPECIAL_TABS.has(type)) {
-                tab = {
-                    title: null,
-                    type,
-                    id,
-                    dirty: false,
-                };
-                switch (type) {
-                    case 'base-info': tab.title = '基础信息'; break;
-                    case 'resource': tab.title = '资源管理器'; break;
-                    case 'doc': tab.title = '帮助文档'; break;
-                }
-            } else {
-                const data = deepCopy(this.data[id]);
-                tab = {
-                    title: null,
-                    type,
-                    id,
-                    content: data,
-                    dirty: false,
-                };
-                switch (type) {
-                    case "role": tab.title = data.name; break;
-                    case "chunk": tab.title = data.title; break;
+            const tab = TAB_TYPES[type] ? TAB_TYPES[type](id, this.data) : null;
+            if (tab) {
+                const index = this.tabs.findIndex(t => t.id === tab.id);
+                if (index >= 0) {
+                    this.tabIndex = index;
+                } else {
+                    this.tabs.push(tab);
+                    this.tabIndex = this.tabs.length - 1;
                 }
             }
-            this.tabs.push(tab);
-            this.tabIndex = this.tabs.length - 1;
         },
 
         close(index) {
@@ -349,6 +381,14 @@ export default {
                 if (!tab.dirty || confirm(`${tab.title}还未保存，确定关闭？`)) {
                     this.tabs.splice(index, 1);
                 }
+            }
+        },
+
+        closeAll() {
+            let prev = -1;
+            while (this.tabs.length && this.tabs.length !== prev) {
+                prev = this.tabs.length;
+                this.close(0);
             }
         },
 
@@ -415,7 +455,6 @@ input[type="text"] {
 
 .edit-area {
     width: 100%;
-    max-width: 64em;
     margin: 0 auto;
 }
 
@@ -440,5 +479,9 @@ input[type="text"] {
 .overflow-auto,
 .inner-overflow-auto > * {
     overflow: auto;
+}
+
+.max-width-64em {
+    max-width: 64em;
 }
 </style>

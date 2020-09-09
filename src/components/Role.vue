@@ -1,6 +1,6 @@
 <template>
     <!-- 角色展示 -->
-    <div class="fill-y pa-5 d-flex">
+    <div class="fill-y max-width-64em pa-5 d-flex">
         <div class="form d-flex flex-column align-center">
             <!-- 头像预览 -->
             <v-avatar 
@@ -22,10 +22,12 @@
             />
 
             <!-- 角色头像 -->
-            <ResSelector label="头像" messages="无实际用途，仅方便编辑" v-model="avatar" />
+            <ResSelector class="flex-grow-0" label="头像" messages="无实际用途，仅方便编辑" v-model="avatar" />
 
             <!-- 角色的立绘 -->
-            <ResSelector label="立绘" v-model="pic" />
+            <ResSelector class="flex-grow-0" label="立绘" v-model="pic" />
+
+            <v-spacer/>
 
             <!-- 删除按钮 -->
             <v-btn color="warning" @click="deleteSelf">
@@ -55,27 +57,24 @@ export default {
     },
 
     props: {
-        content: Object,
+        id: String,
     },
 
     data() {
+        const role = this.$store.state.data[this.id];
         return {
-            name: this.content.name,
-            avatar: this.content.avatar,
-            pic: this.content.pic,
+            name: role.name,
+            avatar: role.avatar,
+            pic: role.pic,
         };
     },
 
     watch: {
-        ...mutateWatcher('content', 'name', 'avatar', 'pic'),
+        ...mutateWatcher(null, 'name', 'avatar', 'pic'),
     },
 
     computed: {
         ...mapState(["data"]),
-
-        id() {
-            return this.content.id;
-        },
 
         picUrl() {
             const res = this.data[this.pic];
