@@ -17,11 +17,11 @@
         />
 
         <v-toolbar 
-            class="debuger absolute"
-            :collapse="openDebuger"
+            class="debug-panel absolute"
+            :collapse="openDebugPanel"
             extension-height="200"
         >
-            <v-app-bar-nav-icon @click="openDebuger = !openDebuger"/>
+            <v-app-bar-nav-icon @click="openDebugPanel = !openDebugPanel"/>
 
             <v-toolbar-title>调试工具</v-toolbar-title>
 
@@ -49,13 +49,13 @@
         </v-toolbar>
 
         <div class="content fill pa-3 d-flex flex-column justify-end">
-            <div class="text round oculus mb-3 pa-2">
+            <div class="text round oculus white--text mb-3 pa-2">
                 {{ speakerName }}：{{ line }}
             </div>
 
-            <ul class="options round oculus pa-2">
+            <ul class="options round oculus white--text pa-2">
                 <li 
-                    class="option py-2 px-5"
+                    class="option round py-2 px-5"
                     v-for="(option, index) of options"
                     :key="index"
                     @click="handleClickOption(index)"
@@ -63,7 +63,7 @@
 
                 <li 
                     v-if="!options.length" 
-                    class="option py-2 px-5"
+                    class="option round py-2 px-5"
                     @click="handleClickDefaultOption"
                 >...</li>
             </ul>
@@ -90,7 +90,7 @@ export default {
             
             hasSetText: false,
             logger: [],
-            openDebuger: false,
+            openDebugPanel: false,
         };
     },
 
@@ -243,7 +243,7 @@ export default {
 }
 
 .oculus {
-    background-color: #FFFFFFE0;
+    background-color: #000000a0;
 }
 
 .text {
@@ -269,10 +269,10 @@ export default {
 }
 
 .option:hover {
-    background-color: #FFFFFF;
+    background-color: #aaaaaaa0;
 }
 
-.debuger {
+.debug-panel {
     z-index: 100;
     opacity: 50%;
 }
