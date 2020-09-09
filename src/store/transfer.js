@@ -27,7 +27,12 @@ function compile(state) {
         instructions.push(
             ['bg', mapping[chunk.background]],
             // ['bgm', mapping[chunk.bgm]],
-            ...chunk.sections.reduce((p, s) => (p.push(...s.text.split('\n').filter(l => !/\s*/.test(l)).map(l => ['line', l, mapping[s.speaker]])), p), []),
+            ...chunk.sections.reduce((p, s) => 
+                (p.push(...s.text
+                    .split('\n')
+                    .filter(l => !/^\s*$/.test(l))
+                    .map(l => ['line', l, mapping[s.speaker]])), p), 
+                []),
             ...chunk.exits.map(e => ['exit', e.text, mapping[e.target]]),
         );
     });
