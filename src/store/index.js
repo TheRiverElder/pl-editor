@@ -7,6 +7,7 @@ import {
     downloadScript,
     loadProjectFromFile,
     loadProjectFromCache,
+    exportToText,
 } from './transfer'
 import {
     createResource,
@@ -26,6 +27,10 @@ import {
     saveAllPanels,
     bindEl,
 } from "./panel";
+import {
+    openDialog,
+    closeDialog,
+} from "./dialog";
 
 Vue.use(Vuex)
 
@@ -49,6 +54,8 @@ export default new Vuex.Store({
         app: null,
 
         messages: [],
+
+        dialog: null,
     },
     mutations: {
         openPanel,
@@ -57,6 +64,9 @@ export default new Vuex.Store({
         savePanel,
         saveAllPanels,
         bindEl,
+
+        openDialog,
+        closeDialog,
 
         cacheState,
         compile,
@@ -75,6 +85,8 @@ export default new Vuex.Store({
         removeChunk,
 
         updateData,
+
+        exportToText,
 
         updateBaseInfo(state, { name, version, authors }) {
             state.name = name || state.name;

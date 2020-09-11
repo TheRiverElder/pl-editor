@@ -134,6 +134,10 @@
                 class="font-weight-light"
             >{{ lastMessage.time | localizeDate }} ： {{ lastMessage.text }}</span>
         </v-footer>
+
+        <v-dialog :value="dialog">
+            <component v-if="dialog" :is="dialog.component"/>
+        </v-dialog>
     </v-app>
 </template>
 
@@ -156,7 +160,7 @@ export default {
     },
 
     computed: {
-        ...mapState(['id', 'panels', "resources", "roles", "chunks", "data", 'messages']),
+        ...mapState(['id', 'panels', "resources", "roles", "chunks", "data", 'messages', 'dialog']),
 
         tabIndex: {
             get() {

@@ -144,6 +144,49 @@ function overriteState(state, obj) {
     appendMessage(state, `载入剧本完成：${obj.name}，ID：${obj.id}`);
 }
 
+function exportToText(state, {selectedChunks, withName, reduceName, withTitle, quotedTitle, withSubtitle}) {
+    const text = 
+        selectedChunks
+        .map(id => state.data[id])
+        .filter(c => !!c)
+        .reduce((t, c) => {
+            if (withTitle) {
+                t.push(quotedTitle ? `【${c.title}】` : c.title);
+            }
+            if (withSubtitle) {
+                t.push(c.subtitle);
+            }
+            t.push('');
+            const lines = c.sections.map(s => 
+                s.text.split('\n')
+                .filter(l => !/^\s*$/.test(l))
+                .map(l => [s.speaker, l])
+            ).flat();
+            if (lines.length) {
+                if (withName) {
+                    let prevSpeaker = null;
+                    for (const line of lines) {
+                        if (!reduceName || line[0] !== prevSpeaker) {
+                            const role = state.data[line[0]];
+                            t.push(`${role ? role.name : '无名氏'}: ${line[1]}`);
+                        } else {
+                            t.push('    ' + line[1]);
+                        }
+                        prevSpeaker = line[0];
+                    }
+                } else {
+                    t.push(...lines.map(l => l[1]))
+                }
+                t.push('');
+            }
+            return t;
+        }, [])
+        .join('\n');
+    const fileName = state.name + '.txt';
+    download(text, fileName, 'text/plain');
+    appendMessage(state, '开始导出纯文本：' + fileName);
+}
+
 export {
     compile,
     cacheState,
@@ -151,4 +194,5 @@ export {
     downloadScript,
     loadProjectFromFile,
     loadProjectFromCache,
+    exportToText,
 }

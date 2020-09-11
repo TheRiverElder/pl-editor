@@ -44,6 +44,16 @@
                         />
                     </v-list-item-title>
                 </v-list-item>
+
+                <v-divider />
+
+                <v-list-item dense @click="openDialog('export-to-text')">
+                    <v-list-item-title>导出为纯文本</v-list-item-title>
+                </v-list-item>
+
+                <v-list-item dense @click="openDialog" disabled>
+                    <v-list-item-title>从纯文本导入</v-list-item-title>
+                </v-list-item>
             </v-list>
         </v-menu>
 
@@ -119,7 +129,8 @@ export default {
         ...mapMutations([
             "openPanel", 'savePanel', 'saveAllPanels', 'closeAllPanels',
             'updateData', 'cacheState',
-            'downloadProject', 'downloadScript', 'compile', 'loadProjectFromFile', 'loadProjectFromCache']),
+            'downloadProject', 'downloadScript', 'compile', 'loadProjectFromFile', 'loadProjectFromCache',
+            'openDialog']),
 
         open(type, id = null) {
             this.openPanel({ type, id });
