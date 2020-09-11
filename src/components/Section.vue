@@ -5,7 +5,7 @@
         @mouseenter="showBtnBar = true"
         @mouseleave="showBtnBar = false"
     >
-        <span class="mt-2 d-flex align-center">
+        <span class="d-flex align-center">
             <!-- 行号 -->
             <span class="line-number text-subtitle-2 mr-3">{{ index + 1 }}</span>
             
@@ -44,7 +44,7 @@
         <v-expand-x-transition>
             <v-btn-toggle 
                 v-if="showBtnBar && !editText"
-                class="btn-tgl mt-2"
+                class="btn-tgl my-0 py-0"
                 dense
                 rounded
                 borderless
@@ -52,7 +52,7 @@
                 <!-- 在当前行之前插入一行 -->
                 <v-btn 
                     icon 
-                    height="2em"
+                    height="1.8em"
                     class="delete-btn" 
                     color="green"
                     @click="$emit('add-line', index)"
@@ -62,7 +62,7 @@
                 <v-btn 
                     v-if="!isOnly"
                     icon 
-                    height="2em"
+                    height="1.8em"
                     class="delete-btn" 
                     color="red"
                     @click="$emit('delete-line', index)"

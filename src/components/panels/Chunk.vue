@@ -98,6 +98,7 @@
         <div class="content">
             <Section
                 ref="section"
+                class="mt-2"
                 v-for="(sec, index) of sections"
                 :key="index"
                 :index="index"

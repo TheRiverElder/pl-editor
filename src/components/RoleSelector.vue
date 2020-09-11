@@ -22,11 +22,11 @@
         @click="changingRole = true"
     >
         <RAvatar
-            size="2em"
+            size="1.6em"
             contain
             :src="rolePicUrl"
         />
-        <span>{{ roleName }}</span>
+        <span class="ml-1">{{ roleName }}</span>
     </span>
 </template>
 
@@ -102,6 +102,7 @@ export default {
 .role-input, 
 .role {
     width: 6em;
+    min-height: unset;
 }
 
 </style>
