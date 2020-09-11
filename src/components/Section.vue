@@ -21,12 +21,11 @@
             <v-textarea
                 v-if="editText"
                 rows="1"
-                row-height="1em"
                 auto-grow
                 dense
                 hide-details
                 ref="textInput"
-                class="text-input py-1"
+                class="text-input py-0"
                 v-model="text"
                 @keyup="handleInputKey"
                 @blur="editText = false"
