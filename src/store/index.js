@@ -47,6 +47,8 @@ export default new Vuex.Store({
         tabIndex: -1,
 
         app: null,
+
+        messages: [],
     },
     mutations: {
         openPanel,

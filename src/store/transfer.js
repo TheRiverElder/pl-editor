@@ -1,5 +1,6 @@
 import download from 'downloadjs'
 import { v4 as genId } from 'uuid'
+import { appendMessage } from './message'
 
 const LS_KEY = 'pl-editor-project';
 
@@ -66,6 +67,7 @@ function compile(state, env = 'development') {
     }
 
     state.script = script;
+    appendMessage(state, `剧本编译完成：${state.name}，ID：${state.id}`);
 }
 
 // 缓存工程
@@ -82,20 +84,23 @@ function cacheState(state) {
         roles: state.roles,
         chunks: state.chunks,
     }));
+    appendMessage(state, `缓存完成：${state.name}，ID：${state.id}`);
 }
 
 // 下载工程
 function downloadProject(state) {
     const data = {
+        id: state.id,
+        lastModified: state.lastModified,
         name: state.name,
         version: state.version,
         authors: state.authors,
+        data: state.data,
         resources: state.resources,
         roles: state.roles,
         chunks: state.chunks,
-        data: state.data,
     };
-    download(JSON.stringify(data), data.name + '.egg.proj.json', 'application/json');
+    download(JSON.stringify(data), data.name + '.proj.json', 'application/json');
 }
 
 // 从本地文件缓存读取工程
@@ -119,7 +124,7 @@ function loadProjectFromFile(state, file) {
 function downloadScript(state) {
     const script = state.script;
     if (script) {
-        download(JSON.stringify(script), (script.name || '未命名') + '.egg.json', 'application/json');
+        download(JSON.stringify(script), (script.name || '未命名') + '.json', 'application/json');
     }
 }
 
@@ -136,6 +141,7 @@ function overriteState(state, obj) {
         chunks: [],
         script: null,
     }, obj);
+    appendMessage(state, `载入剧本完成：${obj.name}，ID：${obj.id}`);
 }
 
 export {

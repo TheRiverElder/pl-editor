@@ -92,7 +92,7 @@
 
                         <span class="mx-1">{{ tab.title }}</span>
 
-                        <v-btn x-small icon @click="close(index)">
+                        <v-btn x-small icon @click="closePanel({index})">
                             <v-icon x-small>{{ tab.dirty ? 'mdi-circle' : 'mdi-close' }}</v-icon>
                         </v-btn>
                     </v-tab>
@@ -106,15 +106,15 @@
                     active-class=""
                 >
                     <v-tab-item 
-                        v-for="(tab, index) of panels" 
-                        :key="tab.id"
+                        v-for="(panel, index) of panels" 
+                        :key="panel.id"
                         class="fill-y grey lighten-4"
                     >
                         <component 
                             class="edit-area"
-                            :is="tab.component" 
-                            :id="tab.id" 
-                            @mutate="markDirty(tab)"
+                            :is="panel.component" 
+                            :id="panel.id" 
+                            @mutate="panel.dirty = true"
                             @delete="close(index)"
                             ref="panels"
                         />
@@ -122,6 +122,18 @@
                 </v-tabs-items>
             </div>
         </v-main>
+
+        <v-footer 
+            app 
+            dark 
+            height="24" 
+            class="py-0"
+        >
+            <span 
+                v-if="messages.length" 
+                class="font-weight-light"
+            >{{ lastMessage.time | localizeDate }} ： {{ lastMessage.text }}</span>
+        </v-footer>
     </v-app>
 </template>
 
@@ -144,7 +156,7 @@ export default {
     },
 
     computed: {
-        ...mapState(['id', 'panels', "resources", "roles", "chunks", "data"]),
+        ...mapState(['id', 'panels', "resources", "roles", "chunks", "data", 'messages']),
 
         tabIndex: {
             get() {
@@ -153,7 +165,11 @@ export default {
             set(index) {
                 this.setTabIndex(index);
             }
-        }
+        },
+
+        lastMessage() {
+            return this.messages[this.messages.length - 1];
+        },
     },
 
     watch: {
@@ -167,7 +183,9 @@ export default {
     },
 
     methods: {
-        ...mapMutations(['openPanel', 'closeAllPanels', 'setTabIndex', 'setApp']),
+        ...mapMutations(['openPanel', 'closePanel', 'closeAllPanels', 'setTabIndex', 'setApp',
+            'createRole', 'createChunk',
+            'savePanel', 'saveAllPanels']),
 
         createNewRole() {
             this.createRole({cb: role => this.open('role', role.id)});
@@ -188,9 +206,9 @@ export default {
                 event.preventDefault();
                 event.stopPropagation();
                 if (event.shiftKey) {
-                    this.panels.forEach((tab, index) => this.saveTab(tab, index));
+                    this.saveAllPanels();
                 } else {
-                    this.saveTab(this.panels[this.tabIndex], this.tabIndex);
+                    this.savePanel(this.tabIndex);
                 }
                 this.$forceUpdate();
             }

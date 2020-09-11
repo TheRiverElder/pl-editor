@@ -2,9 +2,9 @@
     <v-container>
         <h3>基础信息</h3>
 
-        <v-subheader>剧本ID：{{ id }}</v-subheader>
+        <v-subheader>剧本ID：{{ $store.state.id }}</v-subheader>
 
-        <v-subheader>最后修改时间：{{ timeString }}</v-subheader>
+        <v-subheader>最后修改时间：{{ lastModified | localizeDate }}</v-subheader>
 
         <v-text-field
             label="剧本名称"
@@ -33,6 +33,10 @@ import { mutateWatcher } from '../../utils/vue-util.js'
 export default {
     name: "BaseInfo",
 
+    props: {
+        id: String,
+    },
+
     data() {
         return {
             name: this.$store.state.name,
@@ -42,12 +46,7 @@ export default {
     },
 
     computed: {
-        ...mapState(['id', 'lastModified']),
-
-        timeString() {
-            const time = new Date(this.lastModified);
-            return time.toLocaleDateString() + '-' + time.toLocaleTimeString(undefined, {hour12: false});
-        },
+        ...mapState(['lastModified']),
     },
 
     watch: {
@@ -70,6 +69,10 @@ export default {
             this.version = this.$store.state.version;
             this.authors = this.$store.state.authors;
         },
+    },
+
+    created() {
+        this.$store.commit('bindEl', { id: this.id, el: this });
     },
 };
 </script>

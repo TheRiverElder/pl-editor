@@ -118,7 +118,7 @@ export default {
     methods: {
         ...mapMutations([
             "openPanel", 'savePanel', 'saveAllPanels', 'closeAllPanels',
-            'updateData', 'cacheState', 'createRole', 'createChunk',
+            'updateData', 'cacheState',
             'downloadProject', 'downloadScript', 'compile', 'loadProjectFromFile', 'loadProjectFromCache']),
 
         open(type, id = null) {

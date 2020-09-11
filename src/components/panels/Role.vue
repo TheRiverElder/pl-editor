@@ -104,6 +104,10 @@ export default {
             });
         },
     },
+
+    created() {
+        this.$store.commit('bindEl', { id: this.id, el: this });
+    },
 };
 </script>
 

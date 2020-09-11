@@ -6,6 +6,7 @@ import Demonstration from '../components/panels/Demonstration';
 import Doc from '../components/panels/Doc';
 import ResourceManager from '../components/panels/ResourceManager';
 import Role from '../components/panels/Role';
+import { cacheState } from './transfer';
 
 const PANEL_TYPES = {
     "base-info"(id) {
@@ -117,7 +118,7 @@ function openPanel(state, { type, id, index = null }) {
             state.tabIndex = alreadyExistIndex;
         } else {
             state.panels.splice(index, 0, panel);
-            state.tabIndex = state.panels.length - 1;
+            state.tabIndex = index;
         }
     }
 }
@@ -156,10 +157,16 @@ function savePanel(state, index = -1) {
     index = findPanelIndex(state, index);
     if (index >= 0) {
         const panel = state.panels[index];
-        if (panel && panel.el && panel.el.save) {
-            panel.el.save();
+        if (panel) {
+            if (panel.el && panel.el.save) {
+                panel.el.save();
+                cacheState(state);
+            }
             panel.dirty = false;
+            const np = PANEL_TYPES[panel.type](panel.id, state.data);
+            panel.title = np.title;
         }
+        // appendMessage(state, `项目保存完成：${panel.title}`);
     }
 }
 
@@ -171,6 +178,8 @@ function saveAllPanels(state) {
     for (let index = 0; index < state.panels.length; index++) {
         savePanel(state, index);
     }
+    cacheState(state);
+    // appendMessage(state, `所有可保存项目保存完成`);
 }
 
 /**
@@ -180,8 +189,8 @@ function saveAllPanels(state) {
  * @param {String} id 面板的id
  * @param {Vue.Component} el 面板所对应的元素
  */
-function bindEl(state, {index, id , el}) {
-    index = findPanelIndex(index, id);
+function bindEl(state, {index, id, el}) {
+    index = findPanelIndex(state, index, id);
     state.panels[index].el = el;
 }
 

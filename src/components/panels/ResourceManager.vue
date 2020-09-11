@@ -73,10 +73,6 @@ export default {
         handleDrop() {
             this.overlay = false;
         },
-
-        save() {
-            // nop
-        },
     },
 };
 </script>
