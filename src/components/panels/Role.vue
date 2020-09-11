@@ -44,9 +44,9 @@
 </template>
 
 <script>
-import ResSelector from "./ResSelector.vue";
+import ResSelector from "../ResSelector.vue";
 import { mapMutations, mapState } from "vuex";
-import { mutateWatcher } from '../utils/vue-util'
+import { mutateWatcher } from '../../utils/vue-util'
 
 
 export default {

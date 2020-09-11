@@ -1,5 +1,11 @@
 <template>
     <v-container>
+        <h3>基础信息</h3>
+
+        <v-subheader>剧本ID：{{ id }}</v-subheader>
+
+        <v-subheader>最后修改时间：{{ timeString }}</v-subheader>
+
         <v-text-field
             label="剧本名称"
             v-model="name"
@@ -21,8 +27,8 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
-import { mutateWatcher } from '../utils/vue-util.js'
+import { mapMutations, mapState } from 'vuex';
+import { mutateWatcher } from '../../utils/vue-util.js'
 
 export default {
     name: "BaseInfo",
@@ -33,6 +39,15 @@ export default {
             version: this.$store.state.version,
             authors: this.$store.state.authors,
         };
+    },
+
+    computed: {
+        ...mapState(['id', 'lastModified']),
+
+        timeString() {
+            const time = new Date(this.lastModified);
+            return time.toLocaleDateString() + '-' + time.toLocaleTimeString(undefined, {hour12: false});
+        },
     },
 
     watch: {

@@ -109,23 +109,6 @@
                 @mutate="$emit('mutate')"
             />
         </div>
-        <!-- <v-virtual-scroll 
-            class="content overflow-auto ma-0 px-15 py-2 flex-grow-1"
-            item-height="35"
-            :items="sections"
-        >
-            <template v-slot="{ item, index }">
-                <Section
-                    ref="section"
-                    :index="index"
-                    :section="item"
-                    :is-only="sections.length === 1"
-                    @add-line="addLine"
-                    @delete-line="deleteLine"
-                    @focus="focusOnSection"
-                />
-            </template>
-        </v-virtual-scroll>-->
 
         <v-row class="flex-grow-0 pa-2">
             <v-btn class="mx-auto" ref="btnAdd" color="primary" @click="addLine" elevation="0">
@@ -137,10 +120,9 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
-import { mutateWatcher } from "../utils/vue-util";
-import ResSelector from "./ResSelector";
-
-import Section from "./Section.vue";
+import { mutateWatcher } from "../../utils/vue-util";
+import ResSelector from "../ResSelector";
+import Section from "../Section.vue";
 
 export default {
     name: "Chunk",

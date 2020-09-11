@@ -70,7 +70,18 @@ function compile(state, env = 'development') {
 
 // 缓存工程
 function cacheState(state) {
-    localStorage.setItem(LS_KEY, JSON.stringify(state));
+    state.lastModified = Date.now();
+    localStorage.setItem(LS_KEY, JSON.stringify({
+        id: state.id,
+        lastModified: state.lastModified,
+        name: state.name,
+        version: state.version,
+        authors: state.authors,
+        data: state.data,
+        resources: state.resources,
+        roles: state.roles,
+        chunks: state.chunks,
+    }));
 }
 
 // 下载工程
@@ -115,6 +126,7 @@ function downloadScript(state) {
 function overriteState(state, obj) {
     Object.assign(state, {
         id: genId(),
+        lastModified: Date.now(),
         name: '未命名',
         version: '1.0.0',
         authors: [],

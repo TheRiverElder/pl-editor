@@ -21,6 +21,7 @@
             <v-textarea
                 v-if="editText"
                 rows="1"
+                row-height="1em"
                 auto-grow
                 dense
                 hide-details
@@ -202,6 +203,11 @@ export default {
     width: 100%;
     resize: none;
     outline: none;
+    line-height: 1em;
+}
+
+.text > p {
+    line-height: 1em;
 }
 
 .selected {

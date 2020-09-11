@@ -1,140 +1,7 @@
 <template>
     <v-app id="app">
         <v-app-bar app color="primary" height="32" clipped-left>
-            <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                        dark
-                        v-bind="attrs"
-                        v-on="on"
-                        text
-                        height="32"
-                        tile
-                    >文件</v-btn>
-                </template>
-
-                <v-list>
-                    <v-list-item dense @click="saveTab(tabIndex)" :disabled="!tabs.length">
-                        <v-list-item-title>保存当前项目</v-list-item-title>
-                    </v-list-item>
-
-                    <v-list-item dense @click="saveAllTabs" :disabled="!tabs.length">
-                        <v-list-item-title>保存所有项目</v-list-item-title>
-                    </v-list-item>
-
-                    <v-divider/>
-
-                    <v-list-item dense @click="downloadProject">
-                        <v-list-item-title>下载工程</v-list-item-title>
-                    </v-list-item>
-
-                    <v-list-item dense @click="downloadScript" :disabled="!script">
-                        <v-list-item-title>下载脚本</v-list-item-title>
-                    </v-list-item>
-
-                    <v-list-item dense @click="cacheState">
-                        <v-list-item-title>缓存至浏览器</v-list-item-title>
-                    </v-list-item>
-
-                    <v-divider/>
-
-                    <v-list-item dense @click="loadProjectFromCache">
-                        <v-list-item-title>从浏览器缓存载入工程</v-list-item-title>
-                    </v-list-item>
-
-                    <v-list-item dense>
-                        <v-list-item-title class="p-relative">
-                            从文件载入工程
-                            <input class="invisible-overlay" type="file" @change="loadProjectFromFile($event.target.files[0])"/>
-                        </v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
-
-            
-            <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                        dark
-                        v-bind="attrs"
-                        v-on="on"
-                        text
-                        height="32"
-                        tile
-                    >工程</v-btn>
-                </template>
-
-                <v-list>
-                    <v-list-item dense @click="compile('development')">
-                        <v-list-item-title>编译为测试版</v-list-item-title>
-                    </v-list-item>
-                    
-                    <v-list-item dense @click="compile('production')" disabled>
-                        <v-list-item-title>编译为发行版</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
-            
-            <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                        dark
-                        v-bind="attrs"
-                        v-on="on"
-                        text
-                        height="32"
-                        tile
-                    >脚本</v-btn>
-                </template>
-
-                <v-list>
-                    <v-list-item dense @click="open('demo')" :disabled="!script">
-                        <v-list-item-title>开始测试</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
-            
-            <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                        dark
-                        v-bind="attrs"
-                        v-on="on"
-                        text
-                        height="32"
-                        tile
-                    >窗口</v-btn>
-                </template>
-
-                <v-list>
-                    <v-list-item dense @click="showNav = !showNav">
-                        <v-list-item-title>开关导航栏</v-list-item-title>
-                    </v-list-item>
-                    
-                    <v-list-item dense @click="closeAll">
-                        <v-list-item-title>关闭所有标签</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
-            
-            <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                        dark
-                        v-bind="attrs"
-                        v-on="on"
-                        text
-                        height="32"
-                        tile
-                    >帮助</v-btn>
-                </template>
-
-                <v-list>
-                    <v-list-item dense @click="open('doc')">
-                        <v-list-item-title>帮助文档</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
+            <MenuBar />
 
             <v-spacer/>
 
@@ -217,7 +84,7 @@
             <div class="fill-y flex-grow-1 d-flex flex-column">
                 <v-tabs class="flex-grow-0" v-model="tabIndex" height="2em">
                     <v-tab 
-                        v-for="(tab, index) of tabs" 
+                        v-for="(tab, index) of panels" 
                         :key="tab.id" 
                         size="small"
                     >
@@ -239,7 +106,7 @@
                     active-class=""
                 >
                     <v-tab-item 
-                        v-for="(tab, index) of tabs" 
+                        v-for="(tab, index) of panels" 
                         :key="tab.id"
                         class="fill-y grey lighten-4"
                     >
@@ -249,7 +116,7 @@
                             :id="tab.id" 
                             @mutate="markDirty(tab)"
                             @delete="close(index)"
-                            ref="tabs"
+                            ref="panels"
                         />
                     </v-tab-item>
                 </v-tabs-items>
@@ -260,111 +127,47 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
-import ResourceManager from "./views/ResourceManager";
-import Role from "./components/Role.vue";
-import Chunk from "./components/Chunk.vue";
-import BaseInfo from "./components/BaseInfo.vue";
-import Doc from "./components/Doc.vue";
-import Demonstration from './views/Demonstration.vue';
+import MenuBar from "./components/MenuBar";
 
-const TAB_TYPES = {
-    "base-info"(id) {
-        return {
-            type: "base-info",
-            id,
-            icon: 'mdi-information-outline',
-            title: '基础信息',
-            component: 'BaseInfo',
-            dirty: false,
-        };
-    },
-    "res-manager"(id) {
-        return {
-            type: "res-manager",
-            id,
-            icon: 'mdi-folder-outline',
-            title: '资源管理器',
-            component: 'ResourceManager',
-            dirty: false,
-        };
-    },
-    "doc"() {
-        return {
-            type: "doc",
-            id: "doc",
-            icon: 'mdi-document',
-            title: '帮助文档',
-            component: 'Doc',
-            dirty: false,
-        };
-    },
-    "demo"() {
-        return {
-            type: "demo",
-            id: "demo",
-            icon: 'mdi-play',
-            title: '演示',
-            component: 'Demonstration',
-            dirty: false,
-        };
-    },
-    "role"(id, data) {
-        return {
-            type: "role",
-            id: id,
-            icon: 'mdi-account-outline',
-            title: data[id] ? data[id].name : '未知角色',
-            component: 'Role',
-            dirty: false,
-        };
-    },
-    "chunk"(id, data) {
-        return {
-            type: "chunk",
-            id: id,
-            icon: 'mdi-text',
-            title: data[id] ? data[id].title : '未知文本段',
-            component: 'Chunk',
-            dirty: false,
-        };
-    },
-};
 
 export default {
     name: "App",
 
     components: {
-        ResourceManager,
-        Role,
-        Chunk,
-        BaseInfo,
-        Doc,
-        Demonstration,
+        MenuBar,
     },
 
     data() {
         return {
-            tabIndex: null,
-            tabs: [],
             showNav: true,
-            Demonstration,
         };
     },
 
     computed: {
-        ...mapState(['id', "resources", "roles", "chunks", "data", 'script']),
+        ...mapState(['id', 'panels', "resources", "roles", "chunks", "data"]),
+
+        tabIndex: {
+            get() {
+                return this.$store.state.tabIndex;
+            },
+            set(index) {
+                this.setTabIndex(index);
+            }
+        }
     },
 
     watch: {
         id(val) {
-            this.closeAll();
-            this.open('base-info', val);
+            this.closeAllPanels();
+            this.openPanel({
+                type: 'base-info', 
+                id: 'base-info' + val
+            });
         }
     },
 
     methods: {
-        ...mapMutations(['updateData', 'cacheState', 'createRole', 'createChunk',
-            'downloadProject', 'downloadScript', 'compile', 'loadProjectFromFile', 'loadProjectFromCache']),
+        ...mapMutations(['openPanel', 'closeAllPanels', 'setTabIndex', 'setApp']),
 
         createNewRole() {
             this.createRole({cb: role => this.open('role', role.id)});
@@ -375,53 +178,7 @@ export default {
         },
 
         open(type, id) {
-            const tab = TAB_TYPES[type] ? TAB_TYPES[type](id, this.data) : null;
-            if (tab) {
-                const index = this.tabs.findIndex(t => t.id === tab.id);
-                if (index >= 0) {
-                    this.tabIndex = index;
-                } else {
-                    this.tabs.push(tab);
-                    this.tabIndex = this.tabs.length - 1;
-                }
-            }
-        },
-
-        close(index) {
-            const tab = this.tabs[index];
-            if (tab) {
-                if (!tab.dirty || confirm(`${tab.title}还未保存，确定关闭？`)) {
-                    this.tabs.splice(index, 1);
-                }
-            }
-        },
-
-        closeAll() {
-            let prev = -1;
-            while (this.tabs.length && this.tabs.length !== prev) {
-                prev = this.tabs.length;
-                this.close(0);
-            }
-        },
-
-        saveTab(tab, index) {
-            if (tab) {
-                const el = this.$refs.tabs[index];
-                if (el) {
-                    el.save();
-                }
-                tab.dirty = false;
-                this.cacheState();
-            }
-        },
-
-        saveAllTabs() {
-            this.tabs.forEach((t, i) => this.saveTab(t, i));
-            this.cacheState();
-        },
-
-        markDirty(tab) {
-            tab.dirty = true;
+            this.openPanel({type, id});
         },
     },
 
@@ -431,14 +188,18 @@ export default {
                 event.preventDefault();
                 event.stopPropagation();
                 if (event.shiftKey) {
-                    this.tabs.forEach((tab, index) => this.saveTab(tab, index));
+                    this.panels.forEach((tab, index) => this.saveTab(tab, index));
                 } else {
-                    this.saveTab(this.tabs[this.tabIndex], this.tabIndex);
+                    this.saveTab(this.panels[this.tabIndex], this.tabIndex);
                 }
                 this.$forceUpdate();
             }
         });
-        this.open('base-info', this.id);
+        this.openPanel({
+            type: 'base-info', 
+            id: 'base-info' + this.id
+        });
+        this.setApp(this);
     },
 };
 </script>
