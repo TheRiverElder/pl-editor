@@ -5,7 +5,7 @@
 
             <v-spacer/>
 
-            <v-subheader class="white--text">v2.5</v-subheader>
+            <v-subheader class="white--text">v2.5.2</v-subheader>
         </v-app-bar>
 
         <!-- 侧边栏或者叫目录 -->

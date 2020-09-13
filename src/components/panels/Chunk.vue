@@ -1,5 +1,5 @@
 <template>
-    <div class="chunk max-width-64em px-5">
+    <div class="chunk max-width-64em px-5" ref="chunk">
         <v-container class="pa-0 d-flex flex-column">
             <div class="chunk-info px-5 pt-5 pb-0">
                 <!-- 背景预览 -->
@@ -218,8 +218,16 @@ export default {
             index = Math.max(0, Math.min(index, this.sections.length - 1));
             const list = this.$refs.section;
             if (list.length && index < list.length) {
+                const elVue = list[index];
+                const el = elVue.$el;
+                const chunkEl = this.$refs.chunk;
+                const containerEl = chunkEl.offsetParent;
                 // this.$vuetify.goTo(list[index].$el);
-                list[index].focus();
+                containerEl.scrollTo({
+                    top: el.offsetTop + chunkEl.offsetTop - (containerEl.clientHeight - el.clientHeight) / 2, 
+                    behavior: 'smooth',
+                });
+                elVue.focus();
             }
         },
 
