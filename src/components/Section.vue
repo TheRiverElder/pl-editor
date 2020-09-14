@@ -27,7 +27,7 @@
                 ref="textInput"
                 class="text-input py-0"
                 v-model="text"
-                @keyup="handleInputKey"
+                @keydown="handleInputKey"
                 @blur="editText = false"
             />
 
@@ -105,7 +105,7 @@ export default {
     },
 
     computed: {
-        ...mapState(['data']),
+        ...mapState(['data', 'roles']),
 
         lines() {
             return this.text.split('\n').filter(l => !/^\s*$/.test(l)).map(l => l.trim());
@@ -154,6 +154,8 @@ export default {
                 case 'Enter': this.$emit('add-line', this.index + 1); break;
                 case 'ArrowUp': this.$emit('focus', this.index - 1); break;
                 case 'ArrowDown': this.$emit('focus', this.index + 1); break;
+                case 'ArrowLeft': this.toggleRole(-1); break;
+                case 'ArrowRight': this.toggleRole(1); break;
                 case 'Backspace': {
                     if (/^\s*$/.test(this.section.text)) {
                         this.$emit('delete-line', this.index);
@@ -164,7 +166,24 @@ export default {
 
             if (doPreventDefault) {
                 event.preventDefault();
+                event.stopPropagation();
             }
+        },
+
+        toggleRole(offset = 1) {
+            const currentIndex = this.roles.indexOf(this.speaker);
+            if (currentIndex < 0) {
+                this.speaker = this.roles.length ? this.roles[0] : null;
+                return;
+            }
+            let index = currentIndex + offset;
+            if (index < 0) {
+                index += (Math.floor(Math.abs(index) / this.roles.length) + 1) * this.roles.length;
+            }
+            if (index >= this.roles.length) {
+                index %= this.roles.length;
+            }
+            this.speaker = this.roles[index];
         }
     },
 
