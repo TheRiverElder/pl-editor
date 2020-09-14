@@ -392,23 +392,33 @@
             <ul>
                 <li>
                     <span>按下</span>
-                    <code>ctrl + Enter</code>
+                    <code>ctrl + Enter（回车）</code>
                     <span>，则是自动在该小节后插入一个新的小节，并聚焦到这个新的小节上；</span>
                 </li>
                 <li>
                     <span>按下</span>
-                    <code>ctrl + BackSpace</code>
-                    <span>且该小节文本都是空的（或者由空字符组成），则该小节将被删除并聚焦到上一个小节（如果存在的话）；</span>
+                    <code>ctrl + BackSpace（退格）</code>
+                    <span>且该小节文本都是空的（或者由空字符组成），则该小节将被删除并合并到上一个小节（如果存在的话）；</span>
                 </li>
                 <li>
                     <span>按下</span>
-                    <code>ctrl + ArrowUp</code>
+                    <code>ctrl + ArrowUp（上箭头）</code>
                     <span>，则聚焦到上一个小节（如果存在的话）；</span>
                 </li>
                 <li>
                     <span>按下</span>
-                    <code>ctrl + ArrowDown</code>
+                    <code>ctrl + ArrowDown（下箭头）</code>
                     <span>，则聚焦到下一个小节（如果存在的话）。</span>
+                </li>
+                <li>
+                    <span>按下</span>
+                    <code>ctrl + ArrowDown（左箭头）</code>
+                    <span>，切换发言者为角色列表的上一个角色（如果存在的话）。</span>
+                </li>
+                <li>
+                    <span>按下</span>
+                    <code>ctrl + ArrowDown（右箭头）</code>
+                    <span>，切换发言者为角色列表的下一个角色（如果存在的话）。</span>
                 </li>
             </ul>
             <h3>
