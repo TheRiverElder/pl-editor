@@ -175,7 +175,7 @@ export default {
     methods: {
         ...mapMutations(["removeChunk", "updateData"]),
 
-        addLine(index) {
+        addLine(index, following = '') {
             if (
                 "number" !== typeof index ||
                 index < 0 ||
@@ -184,16 +184,25 @@ export default {
                 index = this.sections.length;
             }
             const speaker = index ? this.sections[index - 1].speaker : null;
-            const section = { speaker, text: "" };
+            const section = { speaker, text: following };
             this.sections.splice(index, 0, section);
             this.$emit("mutate");
             this.$nextTick(() => this.focusOnSection(index));
         },
 
-        deleteLine(index) {
+        deleteLine(index, following = '') {
             this.sections.splice(index, 1);
+            if (index) {
+                const prev = this.sections[index - 1];
+                this.sections[index - 1] = {
+                    speaker: prev.speaker,
+                    text: prev.text + following
+                };
+                this.$nextTick(() => this.focusOnSection(index - 1, prev.text.length));
+            } else {
+                this.$nextTick(() => this.focusOnSection(index - 1));
+            }
             this.$emit("mutate");
-            this.$nextTick(() => this.focusOnSection(index - 1));
         },
 
         addExit() {
@@ -214,7 +223,7 @@ export default {
             this.$emit("delete", this.id);
         },
 
-        focusOnSection(index) {
+        focusOnSection(index, start = -1, end = -1) {
             index = Math.max(0, Math.min(index, this.sections.length - 1));
             const list = this.$refs.section;
             if (list.length && index < list.length) {
@@ -227,7 +236,7 @@ export default {
                     top: el.offsetTop + chunkEl.offsetTop - (containerEl.clientHeight - el.clientHeight) / 2, 
                     behavior: 'smooth',
                 });
-                elVue.focus();
+                elVue.focus(start, end);
             }
         },
 

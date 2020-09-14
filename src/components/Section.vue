@@ -102,6 +102,11 @@ export default {
 
     watch: {
         ...mutateWatcher('section', 'speaker', 'text'),
+
+        section(val) {
+            this.speaker = val.speaker;
+            this.text = val.text;
+        },
     },
 
     computed: {
@@ -136,12 +141,22 @@ export default {
     },
 
     methods: {
-        focus() {
+        focus(selectionStart = -1, selectionEnd = -1) {
+            if (selectionStart < 0) {
+                selectionStart = selectionEnd = this.text.length;
+            }
+            if (selectionEnd < 0) {
+                selectionEnd = selectionStart;
+            }
             if (this.editText) {
-                this.$refs.textInput.focus()
+                const ipt = this.$refs.textInput;
+                ipt.focus();
             } else {
                 this.editText = true;
-                this.$nextTick(() => this.$refs.textInput.focus());
+                this.$nextTick(() => {
+                    const ipt = this.$refs.textInput;
+                    ipt.focus();
+                });
             }
         },
 
@@ -151,22 +166,38 @@ export default {
                 return;
             }
             switch(event.key) {
-                case 'Enter': this.$emit('add-line', this.index + 1); break;
+                case 'Enter': {
+                    const ipt = event.target;
+                    if (/^\s*$/.test(this.section.text)) {
+                        this.$emit('add-line', this.index + 1);
+                    } else {
+                        const start = Math.min(ipt.selectionStart, ipt.selectionEnd);
+                        const end = Math.max(ipt.selectionStart, ipt.selectionEnd);
+                        const append = this.text.slice(end);
+                        this.text = this.text.slice(0, start);
+                        this.$emit('add-line', this.index + 1, append);
+                    }
+                } break;
+                case 'Backspace': {
+                    const ipt = event.target;
+                    if (/^\s*$/.test(this.section.text)) {
+                        this.$emit('delete-line', this.index);
+                    } else if (this.index > 0 && ipt.selectionStart === 0 && ipt.selectionEnd === 0) {
+                        this.$emit('delete-line', this.index, this.text);
+                    } else {
+                        doPreventDefault = false;
+                    }
+                } break;
                 case 'ArrowUp': this.$emit('focus', this.index - 1); break;
                 case 'ArrowDown': this.$emit('focus', this.index + 1); break;
                 case 'ArrowLeft': this.toggleRole(-1); break;
                 case 'ArrowRight': this.toggleRole(1); break;
-                case 'Backspace': {
-                    if (/^\s*$/.test(this.section.text)) {
-                        this.$emit('delete-line', this.index);
-                    }
-                } break;
                 default: doPreventDefault = false;
             }
 
             if (doPreventDefault) {
                 event.preventDefault();
-                event.stopPropagation();
+                // event.stopPropagation();
             }
         },
 
