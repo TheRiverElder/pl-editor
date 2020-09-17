@@ -4,6 +4,7 @@
         :messages="messages"
         :placeholder="placeholder"
         :no-data-text="noDataText || '无可用资源'"
+        :disabled="disabled"
         :items="resList"
         v-model="resId"
         item-text="name"
@@ -23,6 +24,7 @@ export default {
         value: String,
         messages: [Array, String],
         label: String,
+        disabled: Boolean,
         placeholder: String,
         noDataText: String,
     },

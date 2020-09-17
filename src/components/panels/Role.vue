@@ -21,11 +21,29 @@
                 v-model="name"
             />
 
+            <!-- 设为无立绘角色，用于旁白或主角自身 -->
+            <v-switch 
+                class="flex-grow-0" 
+                label="无立绘角色" 
+                v-model="noPic" 
+            />
+
             <!-- 角色头像 -->
-            <ResSelector class="flex-grow-0" label="头像" messages="无实际用途，仅方便编辑" v-model="avatar" />
+            <ResSelector 
+                class="flex-grow-0" 
+                label="头像"
+                messages="无实际用途，仅方便编辑" 
+                v-model="avatar" 
+            />
 
             <!-- 角色的立绘 -->
-            <ResSelector class="flex-grow-0" label="立绘" v-model="pic" />
+            <ResSelector 
+                class="flex-grow-0" 
+                label="立绘"
+                :disabled="noPic" 
+                :messages="noPic ? '无立绘角色无法设置立绘' : ''"
+                v-model="pic" 
+            />
 
             <v-spacer/>
 
@@ -38,7 +56,11 @@
 
         <!-- 立绘预览 -->
         <div class="img-wrapper flex-grow-1">
-            <img :src="picUrl" />
+            <img 
+                v-if="!noPic && pic" 
+                :alt="name" 
+                :src="picUrl"
+            />
         </div>
     </div>
 </template>
@@ -66,11 +88,12 @@ export default {
             name: role.name,
             avatar: role.avatar,
             pic: role.pic,
+            noPic: false,
         };
     },
 
     watch: {
-        ...mutateWatcher(null, 'name', 'avatar', 'pic'),
+        ...mutateWatcher(null, 'name', 'avatar', 'pic', 'noPic'),
     },
 
     computed: {
@@ -101,6 +124,7 @@ export default {
                 name: this.name,
                 avatar: this.avatar,
                 pic: this.pic,
+                noPic: this.noPic,
             });
         },
     },

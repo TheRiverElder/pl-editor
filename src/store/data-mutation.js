@@ -15,10 +15,10 @@ function create(state, catalog, data, cb) {
 function createResource(state, {
     name = '未命名资源',
     src = null,
-    type = 'image/*',
+    mine = 'image/*',
     cb,
 } = {}) {
-    return create(state, 'resources', { name, src, type }, cb);
+    return create(state, 'resources', { name, src, mine, type: 'resource' }, cb);
 }
 
 // 增加角色
@@ -26,9 +26,10 @@ function createRole(state, {
     name = '未命名角色',
     avatar = null,
     pic = null,
+    noPic = false,
     cb,
 } = {}) {
-    return create(state, 'roles', { name, avatar, pic }, cb);
+    return create(state, 'roles', { name, avatar, pic, noPic, type: 'role' }, cb);
 }
 
 // 增加文本段
@@ -41,7 +42,7 @@ function createChunk(state, {
     exits = [],
     cb,
 } = {}) {
-    return create(state, 'chunks', { title, subtitle, background, sections, exits }, cb);
+    return create(state, 'chunks', { title, subtitle, background, sections, exits, type: 'chunk' }, cb);
 }
 
 
