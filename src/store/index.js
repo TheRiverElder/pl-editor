@@ -8,6 +8,7 @@ import {
     loadProjectFromFile,
     loadProjectFromCache,
     exportToText,
+    importFromText,
 } from './transfer'
 import {
     createResource,
@@ -87,6 +88,7 @@ export default new Vuex.Store({
         updateData,
 
         exportToText,
+        importFromText,
 
         updateBaseInfo(state, { name, version, authors }) {
             state.name = name || state.name;

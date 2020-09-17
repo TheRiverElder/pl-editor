@@ -8,6 +8,7 @@ function create(state, catalog, data, cb) {
     if (cb) {
         cb(newData);
     }
+    return newData.id;
 }
 
 // 增加资源
@@ -17,7 +18,7 @@ function createResource(state, {
     type = 'image/*',
     cb,
 } = {}) {
-    create(state, 'resources', { name, src, type }, cb);
+    return create(state, 'resources', { name, src, type }, cb);
 }
 
 // 增加角色
@@ -27,7 +28,7 @@ function createRole(state, {
     pic = null,
     cb,
 } = {}) {
-    create(state, 'roles', { name, avatar, pic }, cb);
+    return create(state, 'roles', { name, avatar, pic }, cb);
 }
 
 // 增加文本段
@@ -40,7 +41,7 @@ function createChunk(state, {
     exits = [],
     cb,
 } = {}) {
-    create(state, 'chunks', { title, subtitle, background, sections, exits }, cb);
+    return create(state, 'chunks', { title, subtitle, background, sections, exits }, cb);
 }
 
 

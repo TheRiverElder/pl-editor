@@ -8,6 +8,8 @@
             dense
             hide-details
             :items="roleList"
+            :label="label"
+            :disabled="disabled"
             v-model="roleUid"
             item-text="name"
             item-value="id"
@@ -44,6 +46,8 @@ export default {
 
     props: {
         value: String,
+        disabled: Boolean,
+        label: String,
     },
 
     data() {

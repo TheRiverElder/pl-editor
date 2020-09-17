@@ -1,6 +1,7 @@
 import download from 'downloadjs'
 import { v4 as genId } from 'uuid'
 import { appendMessage } from './message'
+import { createChunk } from './data-mutation'
 
 const LS_KEY = 'pl-editor-project';
 
@@ -187,6 +188,31 @@ function exportToText(state, {selectedChunks, withName, reduceName, withTitle, q
     appendMessage(state, '开始导出纯文本：' + fileName);
 }
 
+function importFromText(state, {appendToNewChunk, targetChunk, targetSection, autoDetectSpeaker, primarySpeaker, secondarySpeaker, text}) {
+    const sections = text.split('\n').filter(e => !/^\s*$/.test(e)).map(text => ({speaker: null, text}));
+    if (autoDetectSpeaker) {
+        const speakerNames = state.roles.map(id => state.data[id]).reduce((p, r) => (p[r.name] = r.id, p), {})
+        sections.forEach(sec => {
+            const match = /:|：/.exec(sec.text);
+            if (match && match.index > 0) {
+                const speakerName = sec.text.slice(0, match.index).trim();
+                sec.text = sec.text.slice(match.index + 1).trim;
+                sec.speaker = speakerNames[speakerName] || null;
+            }
+        });
+    } else {
+        sections.forEach((sec, i) => sec.speaker = i % 2 ? secondarySpeaker : primarySpeaker);
+    }
+    const chunk = appendToNewChunk ? {sections} : state.data[targetChunk];
+    if (chunk) {
+        targetSection = targetSection || chunk.sections.length;
+        chunk.sections.splice(targetSection, 0, ...sections);
+    }
+    if (appendToNewChunk) {
+        createChunk(state, {...chunk, cb: c => appendMessage(state, `导入${sections.length}行纯文本到：【${c.title}】`)});
+    }
+}
+
 export {
     compile,
     cacheState,
@@ -195,4 +221,5 @@ export {
     loadProjectFromFile,
     loadProjectFromCache,
     exportToText,
+    importFromText,
 }
