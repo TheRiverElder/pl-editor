@@ -42,6 +42,7 @@ export default {
             name: this.$store.state.name,
             version: this.$store.state.version,
             authors: this.$store.state.authors,
+            entry: this.$store.state.entry,
         };
     },
 
@@ -50,7 +51,7 @@ export default {
     },
 
     watch: {
-        ...mutateWatcher(null, 'name', 'version', 'authors'),
+        ...mutateWatcher(null, 'name', 'version', 'authors', 'entry'),
     },
 
     methods: {
@@ -61,6 +62,7 @@ export default {
                 name: this.name, 
                 version: this.version,
                 authors: this.authors,
+                entry: this.entry,
             });
         },
 
@@ -68,6 +70,7 @@ export default {
             this.name = this.$store.state.name;
             this.version = this.$store.state.version;
             this.authors = this.$store.state.authors;
+            this.entry = this.$store.state.entry;
         },
     },
 

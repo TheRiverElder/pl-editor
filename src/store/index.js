@@ -42,6 +42,7 @@ export default new Vuex.Store({
         name: '未命名', // 剧本的名称
         version: '1.0.0', // 版本
         authors: [], // 作者
+        entry: null, // 台词入口
         data: {}, // 所有数据的存储地点
         resources: [], // 资源列表
         roles: [], // 角色列表
