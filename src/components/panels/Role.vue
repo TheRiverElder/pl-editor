@@ -85,10 +85,10 @@ export default {
     data() {
         const role = this.$store.state.data[this.id];
         return {
-            name: role.name,
-            avatar: role.avatar,
-            pic: role.pic,
-            noPic: false,
+            name: role.name || '无名氏',
+            avatar: role.avatar || null,
+            pic: role.pic || null,
+            noPic: role.noPic || false,
         };
     },
 

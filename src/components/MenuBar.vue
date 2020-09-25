@@ -38,7 +38,7 @@
                     <v-list-item-title class="p-relative">
                         从文件载入工程
                         <input
-                            class="invisible-overlay"
+                            class="invisible-overlay cursor-pointer"
                             type="file"
                             @change="loadProjectFromFile($event.target.files[0])"
                         />

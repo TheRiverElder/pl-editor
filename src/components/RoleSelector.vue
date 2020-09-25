@@ -67,7 +67,7 @@ export default {
         ...mapState(['roles', 'data', 'resources']),
 
         roleList() {
-            return this.roles.map(uid => this.data[uid]);
+            return [{id: null, name: '【无角色】'}, ...this.roles.map(uid => this.data[uid])];
         },
 
         roleName() {

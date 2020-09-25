@@ -102,18 +102,21 @@
                 v-for="(sec, index) of sections"
                 :key="index"
                 :index="index"
-                :section="sec"
+                :value="sec"
+				:type="sec.type"
                 :is-only="sections.length === 1"
-                @add-line="addLine"
-                @delete-line="deleteLine"
-                @focus="focusOnSection"
-                @mutate="$emit('mutate')"
+                :manager="manager"
+                @input="updateSection"
             />
         </div>
 
         <v-row class="flex-grow-0 pa-2">
-            <v-btn class="mx-auto" ref="btnAdd" color="primary" @click="addLine" elevation="0">
-                <v-icon>mdi-plus</v-icon>新小节
+            <v-btn class="mx-auto" color="primary" @click="addLine" elevation="0">
+                <v-icon>mdi-plus</v-icon>新台词
+            </v-btn>
+            
+            <v-btn class="mx-auto" color="white" @click="addRoleMutation" elevation="0">
+                <v-icon>mdi-plus</v-icon>新演员调度
             </v-btn>
         </v-row>
     </div>
@@ -121,6 +124,7 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
+import { EditorLineType } from '../../common';
 import { mutateWatcher } from "../../utils/vue-util";
 import ResSelector from "../ResSelector";
 import Section from "../Section.vue";
@@ -149,6 +153,13 @@ export default {
 
             openMenu: false,
             openExits: false,
+
+            manager: {
+                addLine: this.addLine.bind(this),
+                addRoleMutation: this.addRoleMutation.bind(this),
+                deleteSection: this.deleteSection.bind(this),
+                focusOnSection: this.focusOnSection.bind(this),
+            },
         };
     },
 
@@ -184,25 +195,35 @@ export default {
                 index = this.sections.length;
             }
             const speaker = index ? this.sections[index - 1].speaker : null;
-            const section = { speaker, text: following };
+            const section = { type: 'set_line', speaker, text: following };
             this.sections.splice(index, 0, section);
             this.$emit("mutate");
             this.$nextTick(() => this.focusOnSection(index));
         },
 
-        deleteLine(index, following = '') {
+        deleteSection(index, following = '') {
             this.sections.splice(index, 1);
-            if (index) {
-                const prev = this.sections[index - 1];
-                this.sections[index - 1] = {
-                    speaker: prev.speaker,
-                    text: prev.text + following
-                };
-                this.$nextTick(() => this.focusOnSection(index - 1, prev.text.length));
+            if (index && this.sections[index - 1].type === EditorLineType.SET_LINE) {
+                this.updateSection(index - 1, { text: this.sections[index - 1].text + following });
+                this.$nextTick(() => this.focusOnSection(index - 1, this.sections[index - 1].text.length));
             } else {
                 this.$nextTick(() => this.focusOnSection(index - 1));
             }
             this.$emit("mutate");
+        },
+
+        addRoleMutation(index) {
+            if (
+                "number" !== typeof index ||
+                index < 0 ||
+                index > this.sections.length
+            ) {
+                index = this.sections.length;
+            }
+            const section = { type: EditorLineType.MUTATE_ROLES, on: [], out: [] };
+            this.sections.splice(index, 0, section);
+            this.$emit("mutate");
+            this.$nextTick(() => this.focusOnSection(index));
         },
 
         addExit() {
@@ -250,6 +271,12 @@ export default {
                 sections: this.sections,
                 exits: this.exits,
             });
+        },
+        
+        updateSection(index, d) {
+            this.sections[index] = Object.assign({}, this.sections[index], d);
+			// this.$nextTick(() => this.$forceUpdate());
+            this.$emit('mutate');
         },
     },
 

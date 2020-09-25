@@ -5,7 +5,7 @@
 
             <v-spacer/>
 
-            <v-subheader class="white--text">v2.6.1</v-subheader>
+            <v-subheader class="white--text">v2.7.0-dev</v-subheader>
         </v-app-bar>
 
         <!-- 侧边栏或者叫目录 -->
@@ -257,6 +257,26 @@ input[type="text"] {
     position: relative;
 }
 
+.p-absolute {
+    position: absolute;
+}
+
+.abs-left {
+    left: 0;
+}
+
+.abs-right {
+    right: 0;
+}
+
+.abs-top {
+    top: 0;
+}
+
+.abs-bottom {
+    bottom: 0;
+}
+
 .invisible-overlay {
     position: absolute;
     top: 0;
@@ -278,5 +298,9 @@ input[type="text"] {
 
 .max-width-64em {
     max-width: 64em;
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }
 </style>

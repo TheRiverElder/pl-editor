@@ -7,8 +7,9 @@ const ADD_OPTION = 0x04; // params: textAddr, targetAddr
 
 function compile({data, roles, resources, chunks, name, version, authors, entry, tip}) {
     const doMapping = tip === 'development';
-
-    const strings = []; // 字符串常量池
+	
+	const mapping = {};
+    const strings = [...roles.map(r => r.name), ...chunks.map(c => c.map())]; // 字符串常量池
     const files = []; // 文件池
     const instructions = chunks // 指令
         .map(id => data[id])

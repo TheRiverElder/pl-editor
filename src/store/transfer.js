@@ -1,7 +1,7 @@
 import download from 'downloadjs'
-import { v4 as genId } from 'uuid'
 import { appendMessage } from './message'
 import { createChunk } from './data-mutation'
+import { serialize, deserialize } from './persist'
 
 const LS_KEY = 'pl-editor-project';
 
@@ -74,52 +74,31 @@ function compile(state, env = 'development') {
 // 缓存工程
 function cacheState(state) {
     state.lastModified = Date.now();
-    localStorage.setItem(LS_KEY, JSON.stringify({
-        id: state.id,
-        lastModified: state.lastModified,
-        name: state.name,
-        version: state.version,
-        authors: state.authors,
-        entry: state.entry,
-        data: state.data,
-        resources: state.resources,
-        roles: state.roles,
-        chunks: state.chunks,
-    }));
+    localStorage.setItem(LS_KEY, serialize(state));
     appendMessage(state, `缓存完成：${state.name}，ID：${state.id}`);
 }
 
 // 下载工程
 function downloadProject(state) {
-    const data = {
-        id: state.id,
-        lastModified: state.lastModified,
-        name: state.name,
-        version: state.version,
-        authors: state.authors,
-        entry: state.entry,
-        data: state.data,
-        resources: state.resources,
-        roles: state.roles,
-        chunks: state.chunks,
-    };
-    download(JSON.stringify(data), data.name + '.proj.json', 'application/json');
-}
-
-// 从本地文件缓存读取工程
-function loadProjectFromCache(state) {
-    const json = localStorage.getItem(LS_KEY);
-    if (json) {
-        overriteState(state, JSON.parse(json));
-    }
+    const string = serialize(state);
+    download(string, state.name + '.proj.json', 'application/json');
+    appendMessage(state, `开始下载工程【${state.name}】`);
 }
 
 // 从浏览器缓存读取工程
+function loadProjectFromCache(state) {
+    const err = deserialize(state, localStorage.getItem(LS_KEY));
+    appendMessage(state, err ? `载入失败：${err}` : `载入【${state.name}】完成`);
+}
+
+// 从本地文件缓存读取工程
 function loadProjectFromFile(state, file) {
     const reader = new FileReader();
     reader.onload = () => {
-        overriteState(state, JSON.parse(reader.result));
+        const err = deserialize(state, reader.result);
+        appendMessage(state, err ? `载入失败：${err}` : `载入【${state.name}】完成`);
     }
+    appendMessage(state, `开始载入【${file.name}】`);
     reader.readAsText(file);
 }
 
@@ -128,23 +107,8 @@ function downloadScript(state) {
     const script = state.script;
     if (script) {
         download(JSON.stringify(script), (script.name || '未命名') + '.json', 'application/json');
+        appendMessage(state, `开始下载脚本`);
     }
-}
-
-function overriteState(state, obj) {
-    Object.assign(state, {
-        id: genId(),
-        lastModified: Date.now(),
-        name: '未命名',
-        version: '1.0.0',
-        authors: [],
-        data: {},
-        resources: [],
-        roles: [],
-        chunks: [],
-        script: null,
-    }, obj);
-    appendMessage(state, `载入剧本完成：${obj.name}，ID：${obj.id}`);
 }
 
 function exportToText(state, {selectedChunks, withName, reduceName, withTitle, quotedTitle, withSubtitle}) {
