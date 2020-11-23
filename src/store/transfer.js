@@ -2,6 +2,7 @@ import download from 'downloadjs'
 import { appendMessage } from './message'
 import { createChunk } from './data-mutation'
 import { serialize, deserialize } from './persist'
+import { EditorSectionType } from '../common.js'
 
 const LS_KEY = 'pl-editor-project';
 
@@ -38,7 +39,7 @@ function compile(state, env = 'development') {
         instructions.push(
             ['bg', mapping[chunk.background]],
             // ['bgm', mapping[chunk.bgm]],
-            ...chunk.sections.reduce((p, s) => 
+            ...chunk.sections.filter(s => s.type === EditorSectionType.SET_LINE).reduce((p, s) => 
                 (p.push(...s.text
                     .split('\n')
                     .filter(l => !/^\s*$/.test(l))

@@ -124,7 +124,7 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
-import { EditorLineType } from '../../common';
+import { EditorSectionType } from '../../common';
 import { mutateWatcher } from "../../utils/vue-util";
 import ResSelector from "../ResSelector";
 import Section from "../Section.vue";
@@ -203,7 +203,7 @@ export default {
 
         deleteSection(index, following = '') {
             this.sections.splice(index, 1);
-            if (index && this.sections[index - 1].type === EditorLineType.SET_LINE) {
+            if (index && this.sections[index - 1].type === EditorSectionType.SET_LINE) {
                 this.updateSection(index - 1, { text: this.sections[index - 1].text + following });
                 this.$nextTick(() => this.focusOnSection(index - 1, this.sections[index - 1].text.length));
             } else {
@@ -220,7 +220,7 @@ export default {
             ) {
                 index = this.sections.length;
             }
-            const section = { type: EditorLineType.MUTATE_ROLES, on: [], out: [] };
+            const section = { type: EditorSectionType.MUTATE_ROLES, on: [], out: [] };
             this.sections.splice(index, 0, section);
             this.$emit("mutate");
             this.$nextTick(() => this.focusOnSection(index));

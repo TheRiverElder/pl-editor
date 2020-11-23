@@ -69,7 +69,7 @@
 <script>
 import RoleMutation from './lines/RoleMutation.vue'
 import LineSetting from './lines/LineSetting.vue'
-import { EditorLineType } from '../common.js'
+import { EditorSectionType } from '../common.js'
 
 
 export default {
@@ -96,7 +96,7 @@ export default {
 
     computed: {
         types() {
-            return EditorLineType;
+            return EditorSectionType;
         },
     },
 

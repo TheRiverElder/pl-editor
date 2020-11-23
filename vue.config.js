@@ -3,5 +3,5 @@ module.exports = {
     "vuetify"
   ],
 
-  publicPath: '/pl-editor/'
+  publicPath: '/pl-editor/',
 }

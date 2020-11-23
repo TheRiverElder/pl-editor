@@ -1,4 +1,4 @@
-const EditorLineType = {
+const EditorSectionType = {
     SET_BG: 'set_bg',
     MUTATE_ROLES: 'mutate_roles',
     SET_LINE: 'set_line',
@@ -17,6 +17,6 @@ const InstructionHead = {
 }
 
 export {
-    EditorLineType,
+    EditorSectionType,
     InstructionHead,
 }
